@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>FFXIV - Pose Image Embedder</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body data-theme="dark">  <!-- Dark mode default -->
@@ -16,8 +17,9 @@
 </div>
 
 <div class="container">
-    <h1>FFXIV - Pose Image Embedder</h1>
+    <h1>FFXIV - Pose Image Embedder - Beta</h1>
     <p class="subtitle">Insert an image directly into your .pose files with ease!</p>
+    <p> This tool is a work in progress. It might break.</p>
 
     <form action="/process" method="post" enctype="multipart/form-data" class="card">
 
@@ -38,7 +40,12 @@
         <input type="file" name="pose_file" accept=".pose,application/json">
 
         <button type="submit">Merge & Download</button>
+        <p class="subtitle">Pose files are actually json files.
+            You can verify the changes by opening up the file in notepad.
+            Changes are to come eventually.</p>
     </form>
+    <p class="subtitle">Made by Tex Nevada - https://github.com/TexNevada/</p>
+
 </div>
 
 <script>
