@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FFXIV - Pose Image Embedder</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body data-theme="dark">  <!-- Dark mode default -->
+
+<div class="theme-toggle">
+    <label class="switch">
+        <input type="checkbox" id="themeSwitch">
+        <span class="slider"></span>
+    </label>
+    <span class="theme-label">Dark Mode</span>
+</div>
+
+<div class="container">
+    <h1>FFXIV - Pose Image Embedder</h1>
+    <p class="subtitle">Insert an image directly into your .pose files with ease!</p>
+
+    <form action="/process" method="post" enctype="multipart/form-data" class="card">
+
+        <h2>Image Source</h2>
+
+        <label>Image URL</label>
+        <input type="text" name="image_url" placeholder="https://example.com/image.png">
+
+        <label>Or upload image</label>
+        <input type="file" name="image_file" accept="image/*">
+
+        <h2>Pose File</h2>
+
+        <label>Pose File URL</label>
+        <input type="text" name="pose_url" placeholder="https://example.com/file.pose">
+
+        <label>Or upload .pose file</label>
+        <input type="file" name="pose_file" accept=".pose,application/json">
+
+        <button type="submit">Merge & Download</button>
+    </form>
+</div>
+
+<script>
+    const switchEl = document.getElementById("themeSwitch");
+    const body = document.body;
+
+    // Default dark mode
+    switchEl.checked = true;
+
+    switchEl.addEventListener("change", () => {
+        if (switchEl.checked) {
+            body.setAttribute("data-theme", "dark");
+            document.querySelector(".theme-label").innerText = "Dark Mode";
+        } else {
+            body.setAttribute("data-theme", "light");
+            document.querySelector(".theme-label").innerText = "Light Mode";
+        }
+    });
+</script>
+
+</body>
+</html>
