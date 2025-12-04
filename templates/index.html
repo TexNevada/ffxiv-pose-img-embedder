@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>FFXIV - Pose Image Embedder for Brio - Beta</title>
+    <title>FFXIV - Pose Image Embedder for Brio</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
@@ -17,11 +17,15 @@
 </div>
 
 <div class="container">
-    <h1>FFXIV - Pose Image Embedder for Brio - Beta</h1>
+    <h1>FFXIV - Pose Image Embedder for Brio</h1>
     <p class="subtitle">Insert an image directly into your .pose files with ease!</p>
-    <p> This tool is a work in progress. It might break.</p>
 
     <form action="/process" method="post" enctype="multipart/form-data" class="card">
+
+        <!-- Insert example image preview (centered, responsive) -->
+        <div class="form-image-preview" aria-hidden="true">
+            <img src="{{ url_for('static', filename='example.png') }}" alt="Example" class="example-img">
+        </div>
 
         <h2>Image Source</h2>
 
@@ -30,6 +34,12 @@
 
         <label>Or upload image</label>
         <input type="file" name="image_file" accept="image/*">
+
+        <label>Thumbnail size</label>
+        <select name="resize">
+            <option value="1080">1080p</option>
+            <option value="720" selected>720p (recommended)</option>
+        </select>
 
         <h2>Pose File</h2>
 
@@ -41,8 +51,7 @@
 
         <button type="submit">Merge & Download</button>
         <p class="subtitle">Pose files are actually json files.
-            You can verify the changes by opening up the file in notepad.
-            Changes are to come eventually.</p>
+            You can verify the changes by opening up the file in notepad.</p>
     </form>
     <div class="center">
         <p class="subtitle">Made by Tex Nevada</p>

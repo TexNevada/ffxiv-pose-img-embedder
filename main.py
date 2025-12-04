@@ -35,6 +35,11 @@ def process():
     # ----- IMAGE -----
     img_url = request.form.get("image_url", "").strip()
     img_file = request.files.get("image_file")
+    # Read requested resize option (default 720p). Allowed: "720", "1080"
+    resize_choice = request.form.get("resize", "720")
+    if resize_choice not in {"720", "1080"}:
+        resize_choice = "720"
+    max_dim = int(resize_choice)
 
     if img_file and img_file.filename:
         image_bytes = img_file.read()
@@ -43,18 +48,47 @@ def process():
     else:
         return "Error: No image provided (URL or file)", 400
 
-    # Verify image type using Pillow
+    # Verify image type using Pillow and optionally downscale
     try:
-        with Image.open(io.BytesIO(image_bytes)) as img:
-            img_format = (img.format or "").lower()
+        img = Image.open(io.BytesIO(image_bytes))
     except UnidentifiedImageError:
         return "Error: Provided image is not a supported image type", 400
 
+    img_format = (img.format or "").lower()
+
     allowed_img_types = {"png", "jpeg", "gif", "bmp", "webp"}
     if img_format not in allowed_img_types:
+        img.close()
         return "Error: Provided image is not a supported image type", 400
 
-    b64_str = image_to_base64(image_bytes)
+    # Only downscale (preserve aspect ratio). Do not stretch.
+    # Skip resizing animated GIFs to avoid complex frame handling.
+    new_image_bytes = image_bytes
+    try:
+        if not (img_format == "gif" and getattr(img, "is_animated", False)):
+            width, height = img.size
+            largest = max(width, height)
+            if largest > max_dim:
+                scale = max_dim / float(largest)
+                new_size = (max(1, int(width * scale)), max(1, int(height * scale)))
+                resized = img.resize(new_size, Image.LANCZOS)
+                buf = io.BytesIO()
+                save_format = (img.format or "").upper()
+                if save_format == "JPEG":
+                    # Ensure JPEG has no alpha
+                    if resized.mode in ("RGBA", "LA"):
+                        resized = resized.convert("RGB")
+                    resized.save(buf, format=save_format, quality=95)
+                else:
+                    resized.save(buf, format=save_format)
+                new_image_bytes = buf.getvalue()
+    finally:
+        try:
+            img.close()
+        except Exception:
+            pass
+
+    b64_str = image_to_base64(new_image_bytes)
 
     # ----- POSE FILE -----
     pose_url = request.form.get("pose_url", "").strip()
