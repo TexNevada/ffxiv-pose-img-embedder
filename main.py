@@ -35,11 +35,15 @@ def process():
     # ----- IMAGE -----
     img_url = request.form.get("image_url", "").strip()
     img_file = request.files.get("image_file")
-    # Read requested resize option (default 720p). Allowed: "720", "1080"
+    # Read requested resize option (default 720p). Allowed: "720", "1080", "none"
     resize_choice = request.form.get("resize", "720")
-    if resize_choice not in {"720", "1080"}:
+    if resize_choice not in {"720", "1080", "none"}:
         resize_choice = "720"
-    max_dim = int(resize_choice)
+    # If "none" selected, do not apply any downscaling; otherwise parse int
+    if resize_choice == "none":
+        max_dim = None
+    else:
+        max_dim = int(resize_choice)
 
     if img_file and img_file.filename:
         image_bytes = img_file.read()
@@ -65,7 +69,8 @@ def process():
     # Skip resizing animated GIFs to avoid complex frame handling.
     new_image_bytes = image_bytes
     try:
-        if not (img_format == "gif" and getattr(img, "is_animated", False)):
+        # Only attempt resize when a max dimension is set and the image is not an animated GIF
+        if max_dim is not None and not (img_format == "gif" and getattr(img, "is_animated", False)):
             width, height = img.size
             largest = max(width, height)
             if largest > max_dim:
