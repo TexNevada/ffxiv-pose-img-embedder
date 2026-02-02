@@ -7,6 +7,10 @@ from pathlib import Path
 from urllib.parse import urlparse
 from PIL import Image, UnidentifiedImageError
 import io
+
+# Application version (displayed in the UI)
+VERSION = "v1.5.0"
+
 app = Flask(__name__)
 
 # Compatibility for Pillow resampling attribute names (Image.Resampling.LANCZOS or Image.LANCZOS)
@@ -52,7 +56,7 @@ def well_known(filename):
 
 @app.route("/", methods=["GET"])
 def index():
-    return render_template("index.html")
+    return render_template("index.html", version=VERSION)
 
 
 @app.route("/process", methods=["POST"])

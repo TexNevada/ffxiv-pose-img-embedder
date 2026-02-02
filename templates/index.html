@@ -63,12 +63,22 @@
         </div>
 
         <button type="submit">Merge & Download</button>
+        <!-- Social buttons: Discord and GitHub -->
+        <div class="social-buttons">
+            <a class="social-btn" id="discordBtn" href="https://discord.gg/kWGEfw9hWU" target="_blank" rel="noopener noreferrer">
+                <img src="{{ url_for('static', filename='discord.webp') }}" alt="Discord">
+                <span>Discord</span>
+            </a>
+            <a class="social-btn" id="githubBtn" href="https://github.com/TexNevada/ffxiv-pose-img-embedder" target="_blank" rel="noopener noreferrer">
+                <img src="{{ url_for('static', filename='github.webp') }}" alt="GitHub">
+                <span>GitHub</span>
+            </a>
+        </div>
         <p class="subtitle">Pose files are actually json files.
             You can verify the changes by opening up the file in notepad.</p>
     </form>
     <div class="center">
-        <p class="subtitle">Made by Tex Nevada</p>
-        <p class="subtitle">https://github.com/TexNevada/ffxiv-pose-img-embedder</p>
+        <p class="subtitle">Made by Tex Nevada - {{ version }}</p>
     </div>
 </div>
 
@@ -183,6 +193,7 @@
         });
     })();
 </script>
+
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5478387357048059"
      crossorigin="anonymous"></script>
 

@@ -300,3 +300,62 @@ body[data-theme="dark"] .clear-btn {
     /* darker border for dark theme */
     border-color: rgba(0,0,0,0.25);
 }
+
+/* -------------------------------
+   SOCIAL BUTTONS
+--------------------------------*/
+.social-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+
+.social-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    color: var(--text);
+    background: transparent;
+    font-weight: 600;
+    font-size: 14px;
+    transition: transform 0.08s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+}
+
+.social-btn img {
+    width: 18px;
+    height: 18px;
+    display: block;
+}
+
+/* Discord style */
+.social-btn#discordBtn {
+    background: #5865F2; /* Discord blurple */
+    color: white;
+    border-color: rgba(88,101,242,0.18);
+}
+.social-btn#discordBtn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(88,101,242,0.14);
+}
+
+/* GitHub style */
+.social-btn#githubBtn {
+    background: #24292f; /* GitHub dark */
+    color: white;
+    border-color: rgba(0,0,0,0.25);
+}
+.social-btn#githubBtn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.16);
+}
+
+/* Make social buttons full width on small screens */
+@media (max-width: 480px) {
+    .social-buttons { gap: 8px; }
+    .social-btn { flex: 1 1 100%; justify-content: center; }
+}
