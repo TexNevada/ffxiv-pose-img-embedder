@@ -20,7 +20,7 @@
     <h1>FFXIV - Pose Image Embedder for Brio</h1>
     <p class="subtitle">Insert an image directly into your .pose files with ease!</p>
 
-    <form action="/process" method="post" enctype="multipart/form-data" class="card">
+    <form id="mainForm" action="/process" method="post" enctype="multipart/form-data" class="card">
 
         <!-- Insert example image preview (centered, responsive) -->
         <div class="form-image-preview" aria-hidden="true">
@@ -30,10 +30,16 @@
         <h2>Image Source</h2>
 
         <label>Image URL</label>
-        <input type="text" name="image_url" placeholder="https://example.com/image.png">
+        <div class="input-row">
+            <input id="imageUrlInput" type="text" name="image_url" placeholder="https://example.com/image.png">
+            <button type="button" id="clearImageUrlBtn" class="clear-btn" aria-label="Clear image URL">Clear</button>
+        </div>
 
         <label>Or upload image</label>
-        <input type="file" name="image_file" accept="image/*">
+        <div class="file-row">
+            <input id="imageFileInput" type="file" name="image_file" accept="image/*">
+            <button type="button" id="clearImageBtn" class="clear-btn" aria-label="Clear image file">Clear</button>
+        </div>
 
         <label>Thumbnail size</label>
         <select name="resize">
@@ -45,10 +51,16 @@
         <h2>Pose File</h2>
 
         <label>Pose File URL</label>
-        <input type="text" name="pose_url" placeholder="https://example.com/file.pose">
+        <div class="input-row">
+            <input id="poseUrlInput" type="text" name="pose_url" placeholder="https://example.com/file.pose">
+            <button type="button" id="clearPoseUrlBtn" class="clear-btn" aria-label="Clear pose URL">Clear</button>
+        </div>
 
         <label>Or upload .pose file</label>
-        <input type="file" name="pose_file" accept=".pose,application/json">
+        <div class="file-row">
+            <input id="poseFileInput" type="file" name="pose_file" accept=".pose,application/json">
+            <button type="button" id="clearPoseBtn" class="clear-btn" aria-label="Clear pose file">Clear</button>
+        </div>
 
         <button type="submit">Merge & Download</button>
         <p class="subtitle">Pose files are actually json files.
@@ -76,6 +88,100 @@
             document.querySelector(".theme-label").innerText = "Light Mode";
         }
     });
+</script>
+
+<!-- New JS: file input clear buttons and AJAX form submit to handle download and clearing inputs -->
+<script>
+    (function(){
+        const form = document.getElementById('mainForm');
+        const imageInput = document.getElementById('imageFileInput');
+        const poseInput = document.getElementById('poseFileInput');
+        const clearImageBtn = document.getElementById('clearImageBtn');
+        const clearPoseBtn = document.getElementById('clearPoseBtn');
+        const imageUrlInput = document.getElementById('imageUrlInput');
+        const poseUrlInput = document.getElementById('poseUrlInput');
+        const clearImageUrlBtn = document.getElementById('clearImageUrlBtn');
+        const clearPoseUrlBtn = document.getElementById('clearPoseUrlBtn');
+        const submitBtn = form.querySelector('button[type="submit"]');
+
+        function updateClearBtn(input, btn){
+            if(!input || !btn) return;
+            let hasValue = false;
+            if(input.type === 'file'){
+                hasValue = input.files && input.files.length;
+            } else {
+                hasValue = !!(input.value && input.value.trim().length);
+            }
+            btn.style.display = hasValue ? 'inline-block' : 'none';
+        }
+
+        if(imageInput){
+            imageInput.addEventListener('change', ()=> updateClearBtn(imageInput, clearImageBtn));
+            clearImageBtn.addEventListener('click', ()=>{ imageInput.value = ''; updateClearBtn(imageInput, clearImageBtn); });
+            updateClearBtn(imageInput, clearImageBtn);
+        }
+
+        if(poseInput){
+            poseInput.addEventListener('change', ()=> updateClearBtn(poseInput, clearPoseBtn));
+            clearPoseBtn.addEventListener('click', ()=>{ poseInput.value = ''; updateClearBtn(poseInput, clearPoseBtn); });
+            updateClearBtn(poseInput, clearPoseBtn);
+        }
+
+        // URL input clear button handlers
+        if(imageUrlInput){
+            imageUrlInput.addEventListener('input', ()=> updateClearBtn(imageUrlInput, clearImageUrlBtn));
+            clearImageUrlBtn.addEventListener('click', ()=>{ imageUrlInput.value = ''; updateClearBtn(imageUrlInput, clearImageUrlBtn); });
+            updateClearBtn(imageUrlInput, clearImageUrlBtn);
+        }
+
+        if(poseUrlInput){
+            poseUrlInput.addEventListener('input', ()=> updateClearBtn(poseUrlInput, clearPoseUrlBtn));
+            clearPoseUrlBtn.addEventListener('click', ()=>{ poseUrlInput.value = ''; updateClearBtn(poseUrlInput, clearPoseUrlBtn); });
+            updateClearBtn(poseUrlInput, clearPoseUrlBtn);
+        }
+
+        // Submit via fetch so we can trigger download and then clear file inputs reliably
+        form.addEventListener('submit', async (e)=>{
+            e.preventDefault();
+            submitBtn.disabled = true;
+            const fd = new FormData(form);
+            try{
+                const resp = await fetch(form.action, { method: 'POST', body: fd });
+                if(!resp.ok){
+                    const txt = await resp.text();
+                    alert('Error: ' + txt);
+                    return;
+                }
+                const blob = await resp.blob();
+                // Determine filename from Content-Disposition header if present
+                let filename = 'download.pose';
+                const cd = resp.headers.get('Content-Disposition') || '';
+                const m = cd.match(/filename\*=UTF-8''([^;\n\r]+)|filename="?([^";]+)"?/);
+                if(m){
+                    filename = decodeURIComponent(m[1] || m[2]);
+                }
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+
+                // Clear file inputs after successful download
+                if(imageInput){ imageInput.value = ''; updateClearBtn(imageInput, clearImageBtn); }
+                if(poseInput){ poseInput.value = ''; updateClearBtn(poseInput, clearPoseBtn); }
+                // Clear URL inputs as well
+                if(imageUrlInput){ imageUrlInput.value = ''; updateClearBtn(imageUrlInput, clearImageUrlBtn); }
+                if(poseUrlInput){ poseUrlInput.value = ''; updateClearBtn(poseUrlInput, clearPoseUrlBtn); }
+            }catch(err){
+                alert('Upload failed: ' + err);
+            }finally{
+                submitBtn.disabled = false;
+            }
+        });
+    })();
 </script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5478387357048059"
      crossorigin="anonymous"></script>

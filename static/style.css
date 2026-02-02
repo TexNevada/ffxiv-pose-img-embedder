@@ -244,3 +244,59 @@ body[data-theme="dark"] .container {
     object-fit: contain;
     max-width: 100%;
 }
+
+/* -------------------------------
+   FILE INPUT ROW + CLEAR BUTTON
+--------------------------------*/
+.file-row {
+    display: flex;
+    gap: 8px;
+    align-items: center; /* vertical center alignment */
+}
+
+.file-row input[type="file"] {
+    flex: 1 1 auto;
+    margin-bottom: 0; /* override global bottom margin so it's horizontally aligned with the button */
+    padding: 8px; /* ensure input height is similar to the button */
+    box-sizing: border-box;
+}
+
+/* Input-row: similar to file-row but for text URL inputs */
+.input-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.input-row input[type="text"] {
+    flex: 1 1 auto;
+    margin-bottom: 0; /* align with the clear button */
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+.clear-btn {
+    display: none; /* JS will show when a file is selected */
+    width: 48px; /* slightly smaller */
+    height: 34px; /* match input height */
+    padding: 6px 6px;
+    border-radius: 8px;
+    border: 1px solid #b93a3a;
+    background: #e53a3a; /* red background */
+    color: white;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 1;
+    align-self: center;
+    margin-top: 0; /* override the generic button margin */
+    flex: 0 0 auto; /* don't grow/shrink */
+}
+
+.clear-btn:hover {
+    background: #c73131;
+}
+
+body[data-theme="dark"] .clear-btn {
+    /* darker border for dark theme */
+    border-color: rgba(0,0,0,0.25);
+}
