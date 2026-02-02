@@ -1,4 +1,4 @@
-from flask import Flask, request, send_file, render_template
+from flask import Flask, request, send_file, render_template, send_from_directory, abort
 import base64
 import json
 import requests
@@ -8,6 +8,18 @@ from urllib.parse import urlparse
 from PIL import Image, UnidentifiedImageError
 import io
 app = Flask(__name__)
+
+# Compatibility for Pillow resampling attribute names (Image.Resampling.LANCZOS or Image.LANCZOS)
+# Use hasattr checks to avoid IDE/linter warnings about missing attributes in some Pillow versions.
+if hasattr(Image, "Resampling"):
+    RESAMPLE_LANCZOS = Image.Resampling.LANCZOS
+elif hasattr(Image, "LANCZOS"):
+    RESAMPLE_LANCZOS = Image.LANCZOS
+elif hasattr(Image, "BICUBIC"):
+    RESAMPLE_LANCZOS = Image.BICUBIC
+else:
+    # Fallback to a safe default integer if none of the named constants are present
+    RESAMPLE_LANCZOS = 1
 
 
 def fetch_file_from_url(url: str):  # -> (bytes, str):
@@ -22,6 +34,20 @@ def fetch_file_from_url(url: str):  # -> (bytes, str):
 
 def image_to_base64(image_bytes: bytes) -> str:
     return base64.b64encode(image_bytes).decode("utf-8")
+
+
+@app.route("/.well-known/<path:filename>", methods=["GET"])
+def well_known(filename):
+    """Serve plaintext files from static/.well-known at the /.well-known/ URL path.
+
+    This mirrors how robots.txt is served — plain text responses only.
+    """
+    well_known_dir = Path(app.root_path) / "static" / ".well-known"
+    file_path = well_known_dir / filename
+    if not well_known_dir.exists() or not file_path.exists() or not file_path.is_file():
+        return abort(404)
+    # Force text/plain to make it behave like robots.txt
+    return send_from_directory(str(well_known_dir), filename, mimetype="text/plain")
 
 
 @app.route("/", methods=["GET"])
@@ -76,7 +102,7 @@ def process():
             if largest > max_dim:
                 scale = max_dim / float(largest)
                 new_size = (max(1, int(width * scale)), max(1, int(height * scale)))
-                resized = img.resize(new_size, Image.LANCZOS)
+                resized = img.resize(new_size, RESAMPLE_LANCZOS)
                 buf = io.BytesIO()
                 save_format = (img.format or "").upper()
                 if save_format == "JPEG":
