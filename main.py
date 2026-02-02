@@ -67,7 +67,7 @@ def process():
     img_file = request.files.get("image_file")
     # Read requested resize option (default 720p). Allowed: "720", "1080", "none"
     resize_choice = request.form.get("resize", "720")
-    if resize_choice not in {"720", "1080", "none"}:
+    if resize_choice not in {"480", "720", "1080", "1440p", "none"}:
         resize_choice = "720"
     # If "none" selected, do not apply any downscaling; otherwise parse int
     if resize_choice == "none":
