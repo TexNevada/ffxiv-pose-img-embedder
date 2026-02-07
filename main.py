@@ -77,8 +77,7 @@ def index():
     meta_tags = {
         "title": "FFXIV Pose Image Embedder for Brio",
         "description": "A tool to embed images & other metadata into FFXIV .pose files",
-        "keywords": "ffxiv pose editor, base64 image embedder, ffxiv pose plugin, brio plugin, ffxiv pose tool, image to pose converter",
-        "image": url_for("static", filename=f"{app.root_path}/static/og-preview.png", _external=True),
+        "image": url_for("static", filename="/og-preview.png", _external=True),
         "url": url_for("index", _external=True)
     }
     return render_template("index.html", meta_tags=meta_tags, version=VERSION, discord_url=DISCORD_URL, github_url=GITHUB_URL, shoutout=SHOUTOUT)
