@@ -19,3 +19,4 @@ pytest_cache/
 *.pot
 *.mo
 node_modules/
+env.ini
