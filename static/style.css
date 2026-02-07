@@ -140,6 +140,19 @@ label {
 input[type="text"],
 input[type="file"] {
     width: 100%;
+    padding: 8px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    background: var(--bg);
+    color: var(--text);
+    transition: background 0.3s, color 0.3s, border-color 0.3s;
+    box-sizing: border-box;
+}
+
+/* Only the description textarea should be large */
+textarea#descInput {
+    width: 100%;
     padding: 10px;
     border: 1px solid var(--border);
     border-radius: 8px;
@@ -147,10 +160,14 @@ input[type="file"] {
     background: var(--bg);
     color: var(--text);
     transition: background 0.3s, color 0.3s, border-color 0.3s;
+    resize: vertical;
+    min-height: 80px;
+    box-sizing: border-box;
 }
 
 input[type="text"]:focus,
-input[type="file"]:focus {
+input[type="file"]:focus,
+textarea#descInput:focus {
     outline: none;
     border-color: var(--accent);
     box-shadow: 0 0 0 3px rgba(106,141,255,0.25);
@@ -358,4 +375,213 @@ body[data-theme="dark"] .clear-btn {
 @media (max-width: 480px) {
     .social-buttons { gap: 8px; }
     .social-btn { flex: 1 1 100%; justify-content: center; }
+}
+
+/* -------------------------------
+   ADVANCED PAGE ADDITIONS
+--------------------------------*/
+
+.counter {
+    float: right;
+    font-size: 12px;
+    color: var(--subtle);
+    margin-left: 8px;
+}
+
+.counter.over-limit {
+    color: #ff6b6b; /* red */
+    font-weight: 700;
+}
+
+.tag-list {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.tag-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 10px;
+    background: #2f9d6e; /* match .green-btn */
+    color: #ffffff;
+    border-radius: 999px;
+    font-size: 13px;
+    cursor: pointer;
+    border: 1px solid rgba(47,157,110,0.12);
+    box-shadow: 0 6px 18px rgba(47,157,110,0.08);
+    transition: transform 0.08s ease, box-shadow 0.12s ease, background 0.12s ease;
+}
+
+.tag-chip:hover {
+    transform: translateY(-2px);
+    background: #27885c; /* slightly darker on hover */
+}
+
+/* Dark theme variant: keep green but slightly brighter/sharper contrast */
+body[data-theme="dark"] .tag-chip{
+    background: #2f9d6e;
+    color: #ffffff;
+    border: 1px solid rgba(47,157,110,0.18);
+    box-shadow: 0 6px 18px rgba(47,157,110,0.12);
+}
+
+.tag-input-row input[type="text"]{
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+/* Square preview container (1:1) - image inside keeps aspect ratio using object-fit */
+.image-preview-box{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width: 100%;
+    max-width: 480px; /* same cap as earlier */
+    aspect-ratio: 1 / 1; /* force a square box */
+    border: 1px dashed var(--border);
+    border-radius:8px;
+    padding:8px;
+    background: transparent;
+    margin: 0 auto; /* center */
+    overflow: hidden; /* ensure image doesn't overflow */
+}
+
+.image-preview-box img{
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* preserve aspect ratio; will fully fill for 1:1 images */
+    display: block;
+}
+
+.no-image{
+    color: var(--subtle);
+    font-size: 14px;
+}
+
+.error-banner{
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: #fff1f0;
+    color: #a61b1b;
+    border: 1px solid #f5c6cb;
+    border-radius: 8px;
+}
+
+button.danger{
+    background: #e53a3a;
+    color: white;
+    border: none;
+}
+
+button.danger:hover{ background: #c73131; }
+
+/* Ensure image preview matches input width (approx) */
+@media (min-width: 640px){
+    .card .image-preview-box img{ max-width: 480px; }
+}
+@media (max-width: 639px){
+    .card .image-preview-box img{ max-width: 100%; }
+}
+
+/* Toggle row layout for the (single) Advanced Editor button */
+.toggle-row{
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+/* Green button used for the Advanced Editor link on the main page */
+.green-btn{
+    display: inline-block;
+    padding: 10px 16px;
+    background: #2f9d6e; /* green */
+    color: #fff;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 700;
+    border: none;
+    box-shadow: 0 6px 18px rgba(47,157,110,0.12);
+}
+
+.green-btn:hover{
+    background: #27885c;
+    transform: translateY(-1px);
+}
+
+/* Keep the existing .mode-toggle styles if present consistent */
+.mode-toggle-adv{
+    display: inline-block;
+}
+
+/* Description textarea should match other inputs */
+textarea#descInput {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    background: var(--bg);
+    color: var(--text);
+    resize: vertical;
+    min-height: 80px;
+    box-sizing: border-box;
+}
+
+/* Container for fields that need an inset counter */
+.field-with-counter{
+    position: relative;
+}
+
+.counter-inset{
+    position: absolute;
+    right: 10px;
+    top: 46%; /* slightly above exact center to visually center in many fonts */
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.04);
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--subtle);
+}
+
+.counter-inset.over-limit{
+    color: #ff6b6b;
+    background: rgba(255,107,107,0.06);
+    font-weight: 700;
+}
+
+/* Counter inset for regular inputs (slightly shifted if needed) */
+.counter-inset-input{
+    right: 8px;
+    top: 44%; /* nudge a bit higher for smaller fields */
+}
+
+/* Ensure the description counter doesn't sit below the field */
+.counter-inset#descCounter{
+    right: 10px;
+}
+
+/* Square preview container (1:1) - image inside keeps aspect ratio using object-fit */
+.image-preview-box{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width: 100%;
+    max-width: 480px; /* same cap as earlier */
+    aspect-ratio: 1 / 1; /* force a square box */
+    border: 1px dashed var(--border);
+    border-radius:8px;
+    padding:8px;
+    background: transparent;
+    margin: 0 auto; /* center */
+    overflow: hidden; /* ensure image doesn't overflow */
+}
+
+.image-preview-box img{
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* default to contain; JS will set to cover for near-square images */
+    display: block;
 }

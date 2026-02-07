@@ -27,6 +27,11 @@
             <img src="{{ url_for('static', filename='example.png') }}" alt="Example" class="example-img">
         </div>
 
+        <!-- Simple / Advanced toggle -->
+        <div class="toggle-row">
+            <a class="green-btn mode-toggle-adv" href="/advanced">Advanced Editor</a>
+        </div>
+
         <h2>Image Source</h2>
 
         <label>Image URL</label>
@@ -64,14 +69,16 @@
             <button type="button" id="clearPoseBtn" class="clear-btn" aria-label="Clear pose file">Clear</button>
         </div>
 
+        <p class="note">Max pose file size: 100 MB</p>
+
         <button type="submit">Merge & Download</button>
         <!-- Social buttons: Discord and GitHub -->
         <div class="social-buttons">
-            <a class="social-btn" id="discordBtn" href="https://discord.gg/kWGEfw9hWU" target="_blank" rel="noopener noreferrer">
+            <a class="social-btn" id="discordBtn" href="{{ discord_url }}" target="_blank" rel="noopener noreferrer">
                 <img src="{{ url_for('static', filename='discord.webp') }}" alt="Discord">
                 <span>Discord</span>
             </a>
-            <a class="social-btn" id="githubBtn" href="https://github.com/TexNevada/ffxiv-pose-img-embedder" target="_blank" rel="noopener noreferrer">
+            <a class="social-btn" id="githubBtn" href="{{ github_url }}" target="_blank" rel="noopener noreferrer">
                 <img src="{{ url_for('static', filename='github.webp') }}" alt="GitHub">
                 <span>GitHub</span>
             </a>
@@ -153,51 +160,69 @@
         }
 
         // Submit via fetch so we can trigger download and then clear file inputs reliably
-        form.addEventListener('submit', async (e)=>{
-            e.preventDefault();
-            submitBtn.disabled = true;
-            const fd = new FormData(form);
-            try{
-                const resp = await fetch(form.action, { method: 'POST', body: fd });
-                if(!resp.ok){
-                    const txt = await resp.text();
-                    alert('Error: ' + txt);
-                    return;
-                }
-                const blob = await resp.blob();
-                // Determine filename from Content-Disposition header if present
-                let filename = 'download.pose';
-                const cd = resp.headers.get('Content-Disposition') || '';
-                const m = cd.match(/filename\*=UTF-8''([^;\n\r]+)|filename="?([^";]+)"?/);
-                if(m){
-                    filename = decodeURIComponent(m[1] || m[2]);
-                }
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-                URL.revokeObjectURL(url);
+         form.addEventListener('submit', async (e)=>{
+             e.preventDefault();
+             submitBtn.disabled = true;
 
-                // Clear file inputs after successful download
-                if(imageInput){ imageInput.value = ''; updateClearBtn(imageInput, clearImageBtn); }
-                if(poseInput){ poseInput.value = ''; updateClearBtn(poseInput, clearPoseBtn); }
-                // Clear URL inputs as well
-                if(imageUrlInput){ imageUrlInput.value = ''; updateClearBtn(imageUrlInput, clearImageUrlBtn); }
-                if(poseUrlInput){ poseUrlInput.value = ''; updateClearBtn(poseUrlInput, clearPoseUrlBtn); }
-            }catch(err){
-                alert('Upload failed: ' + err);
-            }finally{
-                submitBtn.disabled = false;
-            }
-        });
+             // Enforce client-side pose file size <= 100MB if a file is selected
+-            const MAX_POSE_BYTES = 100 * 1024 * 1024;
+-            if(poseInput && poseInput.files && poseInput.files.length){
+-                const f = poseInput.files[0];
+-                if(f.size > MAX_POSE_BYTES){
+-                    alert('Error: Pose file exceeds 100 MB');
+-                    submitBtn.disabled = false;
+-                    return;
+-                }
+-            }
++            const MAX_TOTAL_BYTES = 100 * 1024 * 1024;
++            // Calculate combined size of uploaded files (pose + image) when present
++            let totalBytes = 0;
++            if(poseInput && poseInput.files && poseInput.files.length){ totalBytes += poseInput.files[0].size; }
++            if(imageInput && imageInput.files && imageInput.files.length){ totalBytes += imageInput.files[0].size; }
++            if(totalBytes > MAX_TOTAL_BYTES){
++                alert('Error: Combined upload (pose + image) exceeds 100 MB');
++                submitBtn.disabled = false;
++                return;
++            }
+
+             const fd = new FormData(form);
+             try{
+                 const resp = await fetch(form.action, { method: 'POST', body: fd });
+                 if(!resp.ok){
+                     const txt = await resp.text();
+                     alert('Error: ' + txt);
+                     return;
+                 }
+                 const blob = await resp.blob();
+                 // Determine filename from Content-Disposition header if present
+                 let filename = 'download.pose';
+                 const cd = resp.headers.get('Content-Disposition') || '';
+                 const m = cd.match(/filename\*=UTF-8''([^;\n\r]+)|filename="?([^";]+)"?/);
+                 if(m){
+                     filename = decodeURIComponent(m[1] || m[2]);
+                 }
+                 const url = URL.createObjectURL(blob);
+                 const a = document.createElement('a');
+                 a.href = url;
+                 a.download = filename;
+                 document.body.appendChild(a);
+                 a.click();
+                 a.remove();
+                 URL.revokeObjectURL(url);
+
+                 // Clear file inputs after successful download
+                 if(imageInput){ imageInput.value = ''; updateClearBtn(imageInput, clearImageBtn); }
+                 if(poseInput){ poseInput.value = ''; updateClearBtn(poseInput, clearPoseBtn); }
+                 // Clear URL inputs as well
+                 if(imageUrlInput){ imageUrlInput.value = ''; updateClearBtn(imageUrlInput, clearImageUrlBtn); }
+                 if(poseUrlInput){ poseUrlInput.value = ''; updateClearBtn(poseUrlInput, clearPoseUrlBtn); }
+             }catch(err){
+                 alert('Upload failed: ' + err);
+             }finally{
+                 submitBtn.disabled = false;
+             }
+         });
     })();
 </script>
-
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5478387357048059"
-     crossorigin="anonymous"></script>
-
 </body>
 </html>

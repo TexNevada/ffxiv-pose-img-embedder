@@ -4,12 +4,28 @@ import json
 import requests
 import tempfile
 from pathlib import Path
+import configparser
 from urllib.parse import urlparse
 from PIL import Image, UnidentifiedImageError
 import io
 
+if not Path("env.ini").exists():
+    debug = False
+    host = "0.0.0.0"
+    port = 80
+else:
+    config = configparser.ConfigParser()
+    config.read("env.ini")
+    debug = config.getboolean("Boot", "DEBUG")
+    host = config.get("Boot", "IP_BINDING")
+    port = config.getint("Boot", "PORT")
+
 # Application version (displayed in the UI)
-VERSION = "v1.5.0"
+VERSION = "v1.6.0"
+
+# Social links used in templates
+DISCORD_URL = "https://discord.gg/kWGEfw9hWU"
+GITHUB_URL = "https://github.com/TexNevada/ffxiv-pose-img-embedder"
 
 app = Flask(__name__)
 
@@ -56,11 +72,13 @@ def well_known(filename):
 
 @app.route("/", methods=["GET"])
 def index():
-    return render_template("index.html", version=VERSION)
+    return render_template("index.html", version=VERSION, discord_url=DISCORD_URL, github_url=GITHUB_URL)
 
 
 @app.route("/process", methods=["POST"])
 def process():
+
+    # No debug prints. This endpoint accepts image + pose merging via simple form (legacy simple UI).
 
     # ----- IMAGE -----
     img_url = request.form.get("image_url", "").strip()
@@ -157,8 +175,15 @@ def process():
     except Exception:
         return "Error: Pose file is not valid JSON", 400
 
-    pose_json["Base64Image"] = b64_str
+    # If an image was uploaded, convert to base64 server-side and insert/update Base64Image
+    if img_file and img_file.filename:
+        # image_bytes already read above
+        pose_json["Base64Image"] = base64.b64encode(image_bytes).decode('utf-8')
+    else:
+        # no uploaded image -> keep existing behavior (if pose had Base64Image, leave it)
+        pose_json["Base64Image"] = b64_str
 
+    # Write updated pose JSON and return as attachment
     temp = tempfile.NamedTemporaryFile(delete=False, suffix=".pose")
     temp.write(json.dumps(pose_json, indent=2).encode("utf-8"))
     temp.close()
@@ -171,5 +196,167 @@ def process():
     )
 
 
+@app.route("/advanced", methods=["GET"])
+def advanced():
+    """Render the advanced editor page."""
+    return render_template("advanced.html", version=VERSION, discord_url=DISCORD_URL, github_url=GITHUB_URL)
+
+
+@app.route("/process_advanced", methods=["POST"])
+def process_advanced():
+    """Accept original .pose file and a minimal "changes" payload (Option B). Merge changes into JSON and return updated .pose.
+
+    Expected form fields:
+    - pose_file: uploaded original .pose (required)
+    - changes: JSON string with any of the keys: Author, Description, Version, Tags, Base64Image
+    - resize: optional resize choice (same values as /process)
+    - image_file: optional uploaded image (fallback) — if present, server will convert image to base64 and set Base64Image
+    """
+
+    # Enforce pose upload only
+    pose_file = request.files.get('pose_file')
+    if not pose_file or not pose_file.filename:
+        return "Error: No pose file provided (upload required)", 400
+
+    pose_bytes = pose_file.read()
+    pose_filename = pose_file.filename or 'updated.pose'
+
+    # Enforce 100 MB pose limit
+    max_pose_bytes = 100 * 1024 * 1024
+    if len(pose_bytes) > max_pose_bytes:
+        return f"Error: Pose file exceeds {max_pose_bytes} bytes (100 MB)", 400
+
+    # Validate .pose extension
+    if not pose_filename.lower().endswith('.pose'):
+        return "Error: Pose file must have .pose extension", 400
+
+    # Ensure pose file is not an image
+    try:
+        with Image.open(io.BytesIO(pose_bytes)):
+            return "Error: Pose file appears to be an image; expected JSON .pose", 400
+    except UnidentifiedImageError:
+        pass
+
+    # Parse original JSON
+    try:
+        original = json.loads(pose_bytes.decode('utf-8'))
+    except Exception:
+        return "Error: Pose file is not valid JSON", 400
+
+    # Parse changes
+    changes_raw = request.form.get('changes', '').strip()
+    changes = {}
+    if changes_raw:
+        try:
+            changes = json.loads(changes_raw)
+        except Exception:
+            return "Error: Changes payload is not valid JSON", 400
+
+    allowed_keys = {"Author", "Description", "Version", "Tags", "Base64Image"}
+    # Validate and sanitize changes
+    sanitized = {}
+    for k, v in changes.items():
+        if k not in allowed_keys:
+            continue
+        if k in {"Author", "Description", "Version"}:
+            if v is None:
+                sanitized[k] = None
+            elif not isinstance(v, str):
+                return f"Error: {k} must be a string or null", 400
+            else:
+                # server-side length checks
+                limits = {"Author": 50, "Description": 160, "Version": 10}
+                if len(v) > limits[k]:
+                    return f"Error: {k} exceeds max length of {limits[k]}", 400
+                sanitized[k] = v
+        elif k == "Tags":
+            if v is None:
+                sanitized[k] = None
+            elif isinstance(v, list):
+                if len(v) > 50:
+                    return "Error: Tags exceed maximum count of 50", 400
+                # ensure each tag is a string without spaces
+                for tag in v:
+                    if not isinstance(tag, str):
+                        return "Error: Each tag must be a string", 400
+                    if ' ' in tag:
+                        return "Error: Tags cannot contain spaces", 400
+                sanitized[k] = v
+            else:
+                return "Error: Tags must be an array of strings or null", 400
+        elif k == "Base64Image":
+            if v is None:
+                sanitized[k] = None
+            elif isinstance(v, str):
+                sanitized[k] = v
+            else:
+                return "Error: Base64Image must be a base64 string or null", 400
+
+    # If client provided an image file fallback, process it server-side
+    image_fallback = request.files.get('image_file')
+    resize_choice = request.form.get('resize', '720')
+    if resize_choice not in {"480", "720", "1080", "1440p", "none"}:
+        resize_choice = '720'
+    max_dim = None if resize_choice == 'none' else int(resize_choice)
+
+    if image_fallback and image_fallback.filename:
+        img_bytes = image_fallback.read()
+        # Validate image with Pillow
+        try:
+            img = Image.open(io.BytesIO(img_bytes))
+        except UnidentifiedImageError:
+            return "Error: Provided image is not a supported image type", 400
+        img_format = (img.format or '').lower()
+        allowed_img_types = {"png", "jpeg", "gif", "bmp", "webp"}
+        if img_format not in allowed_img_types:
+            img.close()
+            return "Error: Provided image is not a supported image type", 400
+
+        # Server-side resizing: if max_dim is set, resize while preserving aspect ratio
+        new_image_bytes = img_bytes
+        try:
+            if max_dim is not None and not (img_format == 'gif' and getattr(img, 'is_animated', False)):
+                width, height = img.size
+                largest = max(width, height)
+                if largest > max_dim:
+                    scale = max_dim / float(largest)
+                    new_size = (max(1, int(width * scale)), max(1, int(height * scale)))
+                    resized = img.resize(new_size, RESAMPLE_LANCZOS)
+                    buf = io.BytesIO()
+                    save_format = (img.format or '').upper()
+                    if save_format == 'JPEG':
+                        if resized.mode in ('RGBA', 'LA'):
+                            resized = resized.convert('RGB')
+                        resized.save(buf, format=save_format, quality=95)
+                    else:
+                        resized.save(buf, format=save_format)
+                    new_image_bytes = buf.getvalue()
+        finally:
+            try:
+                img.close()
+            except Exception:
+                pass
+
+        sanitized['Base64Image'] = image_to_base64(new_image_bytes)
+
+    # Merge sanitized changes into original JSON (only provided keys)
+    for k, v in sanitized.items():
+        original[k] = v
+
+    # If client didn't provide Base64Image but sent an image_file earlier via server-side processing, sanitized will already have it.
+
+    temp = tempfile.NamedTemporaryFile(delete=False, suffix='.pose')
+    temp.write(json.dumps(original, indent=2).encode('utf-8'))
+    temp.close()
+
+    return send_file(
+        temp.name,
+        as_attachment=True,
+        download_name=pose_filename,
+        mimetype='application/json'
+    )
+
+
+
 if __name__ == "__main__":
-    app.run(debug=False, host="0.0.0.0", port=80, threaded=True)
+    app.run(debug=debug, host=host, port=port, threaded=True)
