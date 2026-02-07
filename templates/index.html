@@ -6,6 +6,7 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="{{ url_for('static', filename='advanced.js') }}"></script>
+    {% include "open-graph-meta-tags.html" %}
 </head>
 <body data-theme="dark">  <!-- Dark mode default -->
 
