@@ -21,13 +21,15 @@ else:
     port = config.getint("Boot", "PORT")
 
 # Application version (displayed in the UI)
-VERSION = "v1.6.2"
+VERSION = "v1.6.3"
 
 # Social links used in templates
 DISCORD_URL = "https://discord.gg/kWGEfw9hWU"
 GITHUB_URL = "https://github.com/TexNevada/ffxiv-pose-img-embedder"
 
 SHOUTOUT = "Shoutout to Brio plugin! This wouldn't exist without it."
+
+thumbnail_sizes = {"480", "720", "1080", "none"}
 
 app = Flask(__name__)
 
@@ -93,7 +95,7 @@ def process():
     img_file = request.files.get("image_file")
     # Read requested resize option (default 720p). Allowed: "720", "1080", "none"
     resize_choice = request.form.get("resize", "720")
-    if resize_choice not in {"480", "720", "1080", "1440p", "none"}:
+    if resize_choice not in thumbnail_sizes:
         resize_choice = "720"
     # If "none" selected, do not apply any downscaling; otherwise parse int
     if resize_choice == "none":
@@ -309,7 +311,7 @@ def process_advanced():
     # If client provided an image file fallback, process it server-side
     image_fallback = request.files.get('image_file')
     resize_choice = request.form.get('resize', '720')
-    if resize_choice not in {"480", "720", "1080", "1440p", "none"}:
+    if resize_choice not in thumbnail_sizes:
         resize_choice = '720'
     max_dim = None if resize_choice == 'none' else int(resize_choice)
 
