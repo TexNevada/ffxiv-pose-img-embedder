@@ -237,10 +237,10 @@ def process_advanced():
     pose_bytes = pose_file.read()
     pose_filename = pose_file.filename or 'updated.pose'
 
-    # Enforce 100 MB pose limit
-    max_pose_bytes = 100 * 1024 * 1024
+    # Enforce 10 MB pose limit
+    max_pose_bytes = 10 * 1024 * 1024
     if len(pose_bytes) > max_pose_bytes:
-        return f"Error: Pose file exceeds {max_pose_bytes} bytes (100 MB)", 400
+        return f"Error: Pose file exceeds {max_pose_bytes} bytes (10 MB)", 400
 
     # Validate .pose extension
     if not pose_filename.lower().endswith('.pose'):

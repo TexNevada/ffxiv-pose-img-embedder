@@ -63,7 +63,7 @@
             <button type="button" id="clearPoseBtn" class="clear-btn" aria-label="Clear pose file">Clear</button>
         </div>
 
-        <p class="note">Max pose file size: 100 MB</p>
+        <p class="note">Max pose file size: 10 MB</p>
 
         <button type="submit">Merge & Download</button>
 
@@ -158,16 +158,16 @@
 -                    return;
 -                }
 -            }
-+            const MAX_TOTAL_BYTES = 100 * 1024 * 1024;
++            const MAX_TOTAL_BYTES = 10 * 1024 * 1024;
 +            // Calculate combined size of uploaded files (pose + image) when present
 +            let totalBytes = 0;
 +            if(poseInput && poseInput.files && poseInput.files.length){ totalBytes += poseInput.files[0].size; }
 +            if(imageInput && imageInput.files && imageInput.files.length){ totalBytes += imageInput.files[0].size; }
 +            if(totalBytes > MAX_TOTAL_BYTES){
-+                alert('Error: Combined upload (pose + image) exceeds 100 MB');
-+                submitBtn.disabled = false;
-+                return;
-+            }
++                alert('Error: Combined upload (pose + image) exceeds 10 MB');
+                 submitBtn.disabled = false;
+                 return;
+             }
 
              const fd = new FormData(form);
              try{

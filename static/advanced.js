@@ -29,8 +29,8 @@
     let replaceImageFile = null; // a File if user selected new image
     let currentObjectUrl = null; // track created object URLs so we can revoke them
 
-    const MAX_POSE_BYTES = 100 * 1024 * 1024;
-    const MAX_TOTAL_BYTES = 100 * 1024 * 1024;
+    const MAX_POSE_BYTES = 10 * 1024 * 1024;
+    const MAX_TOTAL_BYTES = 10 * 1024 * 1024;
     const MAX_TAGS = 50;
 
     function showError(msg){
@@ -133,7 +133,7 @@
         if(!advPoseFile.files || !advPoseFile.files.length) return;
         const f = advPoseFile.files[0];
         if(f.size > MAX_POSE_BYTES){
-            showError('Error: Pose file exceeds 100 MB');
+            showError('Error: Pose file exceeds 10 MB');
             advPoseFile.value = '';
             return;
         }
@@ -285,13 +285,13 @@
         }
         const poseF = advPoseFile.files[0];
         if(poseF.size > MAX_POSE_BYTES){
-            showError('Error: Pose file exceeds 100 MB');
+            showError('Error: Pose file exceeds 10 MB');
             return;
         }
-        // Enforce combined upload size (pose + attached image file if present) <= 100 MB client-side
+        // Enforce combined upload size (pose + attached image file if present) <= 10 MB client-side
         let combined = poseF.size + (replaceImageFile ? replaceImageFile.size : 0);
         if(combined > MAX_TOTAL_BYTES){
-            showError('Error: Combined upload (pose + image) exceeds 100 MB');
+            showError('Error: Combined upload (pose + image) exceeds 10 MB');
             return;
         }
 
