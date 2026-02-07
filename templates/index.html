@@ -18,8 +18,7 @@
 </div>
 
 <div class="container">
-    <h1>FFXIV - Pose Image Embedder for Brio</h1>
-    <p class="subtitle">Insert an image directly into your .pose files with ease!</p>
+    {% include "container-header.html" %}
 
     <form id="mainForm" action="/process" method="post" enctype="multipart/form-data" class="card">
 
@@ -47,14 +46,7 @@
             <button type="button" id="clearImageBtn" class="clear-btn" aria-label="Clear image file">Clear</button>
         </div>
 
-        <label>Thumbnail size</label>
-        <select name="resize">
-            <option value="none">No scaling (keep original)</option>
-            <option value="1440">1440p</option>
-            <option value="1080">1080p</option>
-            <option value="720" selected>720p (recommended)</option>
-            <option value="480">480p</option>
-        </select>
+        {% include "form-image-resizer.html" %}
 
         <h2>Pose File</h2>
 
@@ -73,19 +65,9 @@
         <p class="note">Max pose file size: 100 MB</p>
 
         <button type="submit">Merge & Download</button>
-        <!-- Social buttons: Discord and GitHub -->
-        <div class="social-buttons">
-            <a class="social-btn" id="discordBtn" href="{{ discord_url }}" target="_blank" rel="noopener noreferrer">
-                <img src="{{ url_for('static', filename='discord.webp') }}" alt="Discord">
-                <span>Discord</span>
-            </a>
-            <a class="social-btn" id="githubBtn" href="{{ github_url }}" target="_blank" rel="noopener noreferrer">
-                <img src="{{ url_for('static', filename='github.webp') }}" alt="GitHub">
-                <span>GitHub</span>
-            </a>
-        </div>
-        <p class="subtitle">Pose files are actually json files.
-            You can verify the changes by opening up the file in notepad.</p>
+
+        {% include "container-footer.html" %}
+
     </form>
     <div class="center">
         <p class="subtitle">Made by Tex Nevada - {{ version }}</p>

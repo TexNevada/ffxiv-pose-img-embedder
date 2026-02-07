@@ -21,11 +21,13 @@ else:
     port = config.getint("Boot", "PORT")
 
 # Application version (displayed in the UI)
-VERSION = "v1.6.0"
+VERSION = "v1.6.1"
 
 # Social links used in templates
 DISCORD_URL = "https://discord.gg/kWGEfw9hWU"
 GITHUB_URL = "https://github.com/TexNevada/ffxiv-pose-img-embedder"
+
+SHOUTOUT = "Shoutout to Brio plugin! This wouldn't exist without it."
 
 app = Flask(__name__)
 
@@ -72,7 +74,7 @@ def well_known(filename):
 
 @app.route("/", methods=["GET"])
 def index():
-    return render_template("index.html", version=VERSION, discord_url=DISCORD_URL, github_url=GITHUB_URL)
+    return render_template("index.html", version=VERSION, discord_url=DISCORD_URL, github_url=GITHUB_URL, shoutout=SHOUTOUT)
 
 
 @app.route("/process", methods=["POST"])
@@ -199,7 +201,7 @@ def process():
 @app.route("/advanced", methods=["GET"])
 def advanced():
     """Render the advanced editor page."""
-    return render_template("advanced.html", version=VERSION, discord_url=DISCORD_URL, github_url=GITHUB_URL)
+    return render_template("advanced.html", version=VERSION, discord_url=DISCORD_URL, github_url=GITHUB_URL, shoutout=SHOUTOUT)
 
 
 @app.route("/process_advanced", methods=["POST"])

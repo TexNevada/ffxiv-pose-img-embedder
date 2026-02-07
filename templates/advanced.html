@@ -5,7 +5,7 @@
     <title>Advanced - Pose Editor</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <script src="{{ url_for('static', filename='advanced.js') }}"></script>
+    <script src="{{ url_for('static', filename='advanced.js') }}" defer></script>
 </head>
 <body data-theme="dark">
 
@@ -18,9 +18,10 @@
 </div>
 
 <div class="container">
-    <h1>Advanced Editor</h1>
-    <p class="subtitle">Load a .pose file and edit metadata fields directly.</p>
+    {% include "container-header.html" %}
     <form id="advancedForm" action="/process_advanced" method="post" enctype="multipart/form-data" class="card">
+        <h2 style="text-align:center;">Advanced Editor</h2>
+        <p class="subtitle" style="text-align:center;">Load a .pose file and edit metadata fields directly.</p>
         <div style="margin-bottom:12px; text-align:center;">
             <a class="green-btn" href="/">Simple Editor</a>
         </div>
@@ -30,8 +31,6 @@
             <button type="button" id="clearAdvPose" class="clear-btn">Clear</button>
         </div>
         <p class="note">Max pose file size: 100 MB</p>
-
-        <!-- Always-visible link back to Simple Editor -->
 
         <!-- Resize row hidden until a JSON .pose is loaded (moved below the image preview) -->
         <div id="advancedControls" style="display:none">
@@ -54,20 +53,9 @@
             </div>
 
             <label>Tags</label>
-            <p>Tags are currently disabled due to a bug within brio.
-                This field will reappear once the bug has been resolved.
-                You can click the green tag (if visible) to remove them if you pose contains them.</p>
             <div class="field-with-counter">
                 <div class="tag-input-row">
-
-
-
-                    <!-- TODO: re-enable tags once brio bug is fixed
                     <input id="tagInput" type="text" placeholder="Press Space or Enter to add a tag. Click a tag to remove it.">
-                    -->
-
-
-
                 </div>
                 <span class="counter counter-inset counter-inset-input" id="tagCounter">0/50</span>
             </div>
@@ -87,14 +75,7 @@
 
             <!-- Resize selector moved here and hidden until load -->
             <div id="resizeRow" style="display:none; margin-top:8px;">
-                <label>Thumbnail size</label>
-                <select id="advResize" name="resize">
-                    <option value="none">No scaling (keep original)</option>
-                    <option value="1440">1440p</option>
-                    <option value="1080">1080p</option>
-                    <option value="720" selected>720p (recommended)</option>
-                    <option value="480">480p</option>
-                </select>
+                {% include "form-image-resizer.html" %}
             </div>
 
             <div style="display:flex; gap:12px; margin-top:18px;">
@@ -107,16 +88,9 @@
             <!-- Hidden field to send minimal changes; populated by JS just before submit -->
             <input type="hidden" name="changes" id="changesField">
         </div>
-            <div class="social-buttons" style="margin-top:12px;">
-                <a class="social-btn" id="discordBtn" href="{{ discord_url }}" target="_blank" rel="noopener noreferrer">
-                    <img src="{{ url_for('static', filename='discord.webp') }}" alt="Discord">
-                    <span>Discord</span>
-                </a>
-                <a class="social-btn" id="githubBtn" href="{{ github_url }}" target="_blank" rel="noopener noreferrer">
-                    <img src="{{ url_for('static', filename='github.webp') }}" alt="GitHub">
-                    <span>GitHub</span>
-            </a>
-        </div>
+
+        {% include "container-footer.html" %}
+
     </form>
 
     <div class="center">
