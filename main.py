@@ -76,8 +76,8 @@ def well_known(filename):
 def index():
     meta_tags = {
         "title": "FFXIV Pose Image Embedder for Brio",
-        "description": "A tool to embed images & other metadata into FFXIV .pose files",
-        "image": url_for("static", filename="/og-preview.png", _external=True),
+        "description": "A tool to embed images, tags & other meta_data into FFXIV .pose files for use with the Brio",
+        "image": url_for("static", filename="og-preview.png", _external=True),
         "url": url_for("index", _external=True)
     }
     return render_template("index.html", meta_tags=meta_tags, version=VERSION, discord_url=DISCORD_URL, github_url=GITHUB_URL, shoutout=SHOUTOUT)
