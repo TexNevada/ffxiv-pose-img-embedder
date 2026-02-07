@@ -563,25 +563,66 @@ textarea#descInput {
     right: 10px;
 }
 
-/* Square preview container (1:1) - image inside keeps aspect ratio using object-fit */
-.image-preview-box{
-    display:flex;
-    align-items:center;
-    justify-content:center;
+/* Select (thumbnail size) styling: make the dropdown match other inputs and the theme */
+select#advResize,
+select[name="resize"] {
     width: 100%;
-    max-width: 480px; /* same cap as earlier */
-    aspect-ratio: 1 / 1; /* force a square box */
-    border: 1px dashed var(--border);
-    border-radius:8px;
-    padding:8px;
-    background: transparent;
-    margin: 0 auto; /* center */
-    overflow: hidden; /* ensure image doesn't overflow */
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    background: var(--bg);
+    color: var(--text);
+    box-sizing: border-box;
+    transition: background 0.3s, color 0.3s, border-color 0.3s;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    /* simple custom arrow using layered gradients so the icon adapts to theme color */
+    background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+                      linear-gradient(135deg, currentColor 50%, transparent 50%);
+    background-position: calc(100% - 18px) calc(1em + 2px), calc(100% - 13px) calc(1em + 2px);
+    background-size: 6px 6px, 6px 6px;
+    background-repeat: no-repeat;
+    padding-right: 36px; /* space for the arrow */
 }
 
-.image-preview-box img{
-    width: 100%;
-    height: 100%;
-    object-fit: contain; /* default to contain; JS will set to cover for near-square images */
-    display: block;
+select#advResize:focus,
+select[name="resize"]:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(106,141,255,0.12);
+}
+
+/* Ensure options inherit readable colors in some browsers */
+select#advResize option,
+select[name="resize"] option {
+    background: var(--card-bg);
+    color: var(--text);
+}
+
+/* Style the native "Choose file" button so it matches the site's inputs/buttons */
+input[type="file"]::-webkit-file-upload-button,
+input[type="file"]::file-selector-button {
+    padding: 8px 12px;
+    margin-right: 8px; /* space between button and filename */
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    font-weight: 600;
+    line-height: 1;
+}
+
+input[type="file"]::-webkit-file-upload-button:hover,
+input[type="file"]::file-selector-button:hover {
+    background: rgba(106,141,255,0.06); /* subtle accent on hover */
+    border-color: var(--accent);
+}
+
+input[type="file"]::-webkit-file-upload-button:focus,
+input[type="file"]::file-selector-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(106,141,255,0.12);
 }
