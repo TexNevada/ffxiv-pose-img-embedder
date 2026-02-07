@@ -210,7 +210,7 @@ def advanced():
     meta_tags = {
         "title": "FFXIV Pose Image Embedder for Brio - Advanced Editor",
         "description": "A tool to embed images & other metadata into FFXIV .pose files",
-        "image": url_for("static", filename=f"{app.root_path}/static/og-preview.png", _external=True),
+        "image": url_for("static", filename="og-preview.png", _external=True),
         "url": url_for("index", _external=True)
     }
     return render_template("advanced.html", meta_tags=meta_tags, version=VERSION, discord_url=DISCORD_URL, github_url=GITHUB_URL, shoutout=SHOUTOUT)
