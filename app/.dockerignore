@@ -1,5 +1,5 @@
 .git
-.github
+../.github
 .venv
 venv
 env
@@ -19,4 +19,10 @@ pytest_cache/
 *.pot
 *.mo
 node_modules/
-env.ini
+
+# Custom files and directories to ignore
+README.md
+LICENSE
+app/env.ini
+app/env.ini.example
+app/Dockerfile

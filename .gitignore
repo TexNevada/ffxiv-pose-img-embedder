@@ -210,4 +210,4 @@ marimo/_lsp/
 __marimo__/
 
 # Local env file (new format)
-env.ini
+app/env.ini

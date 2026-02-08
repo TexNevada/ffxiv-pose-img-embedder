@@ -166,7 +166,7 @@ def process():
         return "Error: No pose file provided (URL or file)", 400
 
     if not pose_filename:
-        pose_filename = "updated.pose"
+        pose_filename = "../updated.pose"
 
     # Require .pose extension
     if not pose_filename.lower().endswith(".pose"):
