@@ -8,8 +8,33 @@ on:
 
 jobs:
 
+  test:
+
+    name: Run Python tests
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.14'
+
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f tests/requirements.txt ]; then pip install -r tests/requirements.txt; fi
+
+      - name: Run test runner
+        run: |
+          python ./tests/run-tests.py
+
   build:
 
+    needs: test
     runs-on: ubuntu-latest
 
     steps:

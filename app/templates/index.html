@@ -91,6 +91,12 @@
         const clearPoseUrlBtn = document.getElementById('clearPoseUrlBtn');
         const submitBtn = form.querySelector('button[type="submit"]');
 
+        // Inline error container (insert once)
+        let inlineError = document.createElement('div');
+        inlineError.className = 'inline-error';
+        inlineError.style.display = 'none';
+        form.insertBefore(inlineError, submitBtn);
+
         function updateClearBtn(input, btn){
             if(!input || !btn) return;
             let hasValue = false;
@@ -102,53 +108,90 @@
             btn.style.display = hasValue ? 'inline-block' : 'none';
         }
 
+        function clearValidationStates(){
+            [imageInput, poseInput, imageUrlInput, poseUrlInput].forEach(el=>{ if(!el) return; el.classList.remove('invalid-field'); });
+            inlineError.style.display = 'none';
+            inlineError.textContent = '';
+        }
+
+        function applyInvalid(el){
+            if(!el) return;
+            el.classList.add('invalid-field');
+        }
+
         if(imageInput){
-            imageInput.addEventListener('change', ()=> updateClearBtn(imageInput, clearImageBtn));
+            imageInput.addEventListener('change', ()=> { updateClearBtn(imageInput, clearImageBtn); clearValidationStates(); });
             clearImageBtn.addEventListener('click', ()=>{ imageInput.value = ''; updateClearBtn(imageInput, clearImageBtn); });
             updateClearBtn(imageInput, clearImageBtn);
         }
 
         if(poseInput){
-            poseInput.addEventListener('change', ()=> updateClearBtn(poseInput, clearPoseBtn));
+            poseInput.addEventListener('change', ()=> { updateClearBtn(poseInput, clearPoseBtn); clearValidationStates(); });
             clearPoseBtn.addEventListener('click', ()=>{ poseInput.value = ''; updateClearBtn(poseInput, clearPoseBtn); });
             updateClearBtn(poseInput, clearPoseBtn);
         }
 
         // URL input clear button handlers
         if(imageUrlInput){
-            imageUrlInput.addEventListener('input', ()=> updateClearBtn(imageUrlInput, clearImageUrlBtn));
+            imageUrlInput.addEventListener('input', ()=> { updateClearBtn(imageUrlInput, clearImageUrlBtn); clearValidationStates(); });
             clearImageUrlBtn.addEventListener('click', ()=>{ imageUrlInput.value = ''; updateClearBtn(imageUrlInput, clearImageUrlBtn); });
             updateClearBtn(imageUrlInput, clearImageUrlBtn);
         }
 
         if(poseUrlInput){
-            poseUrlInput.addEventListener('input', ()=> updateClearBtn(poseUrlInput, clearPoseUrlBtn));
+            poseUrlInput.addEventListener('input', ()=> { updateClearBtn(poseUrlInput, clearPoseUrlBtn); clearValidationStates(); });
             clearPoseUrlBtn.addEventListener('click', ()=>{ poseUrlInput.value = ''; updateClearBtn(poseUrlInput, clearPoseUrlBtn); });
             updateClearBtn(poseUrlInput, clearPoseUrlBtn);
+        }
+
+        // Helper to check whether an image source is provided
+        function hasImageSource(){
+            const hasFile = imageInput && imageInput.files && imageInput.files.length;
+            const hasUrl = imageUrlInput && imageUrlInput.value && imageUrlInput.value.trim().length;
+            return !!(hasFile || hasUrl);
+        }
+        // Helper to check whether a pose source is provided
+        function hasPoseSource(){
+            const hasFile = poseInput && poseInput.files && poseInput.files.length;
+            const hasUrl = poseUrlInput && poseUrlInput.value && poseUrlInput.value.trim().length;
+            return !!(hasFile || hasUrl);
         }
 
         // Submit via fetch so we can trigger download and then clear file inputs reliably
          form.addEventListener('submit', async (e)=>{
              e.preventDefault();
+             clearValidationStates();
+
+             // Client-side presence validation: require at least one image source and one pose source
+             let firstInvalid = null;
+             if(!hasImageSource()){
+                 // Mark both URL and file inputs as invalid so user sees where to act
+                 applyInvalid(imageUrlInput);
+                 applyInvalid(imageInput);
+                 if(!firstInvalid) firstInvalid = imageUrlInput || imageInput;
+             }
+             if(!hasPoseSource()){
+                 applyInvalid(poseUrlInput);
+                 applyInvalid(poseInput);
+                 if(!firstInvalid) firstInvalid = poseUrlInput || poseInput;
+             }
+
+             if(firstInvalid){
+                 inlineError.textContent = 'Please provide both an image (URL or file) and a .pose file (URL or upload) before merging.';
+                 inlineError.style.display = 'block';
+                 if(firstInvalid && typeof firstInvalid.focus === 'function') firstInvalid.focus();
+                 return;
+             }
+
              submitBtn.disabled = true;
 
-             // Enforce client-side pose file size <= 100MB if a file is selected
--            const MAX_POSE_BYTES = 100 * 1024 * 1024;
--            if(poseInput && poseInput.files && poseInput.files.length){
--                const f = poseInput.files[0];
--                if(f.size > MAX_POSE_BYTES){
--                    alert('Error: Pose file exceeds 100 MB');
--                    submitBtn.disabled = false;
--                    return;
--                }
--            }
-+            const MAX_TOTAL_BYTES = 10 * 1024 * 1024;
-+            // Calculate combined size of uploaded files (pose + image) when present
-+            let totalBytes = 0;
-+            if(poseInput && poseInput.files && poseInput.files.length){ totalBytes += poseInput.files[0].size; }
-+            if(imageInput && imageInput.files && imageInput.files.length){ totalBytes += imageInput.files[0].size; }
-+            if(totalBytes > MAX_TOTAL_BYTES){
-+                alert('Error: Combined upload (pose + image) exceeds 10 MB');
+             const MAX_TOTAL_BYTES = 10 * 1024 * 1024;
+             // Calculate combined size of uploaded files (pose + image) when present
+             let totalBytes = 0;
+             if(poseInput && poseInput.files && poseInput.files.length){ totalBytes += poseInput.files[0].size; }
+             if(imageInput && imageInput.files && imageInput.files.length){ totalBytes += imageInput.files[0].size; }
+             if(totalBytes > MAX_TOTAL_BYTES){
+                 alert('Error: Combined upload (pose + image) exceeds 10 MB');
                  submitBtn.disabled = false;
                  return;
              }

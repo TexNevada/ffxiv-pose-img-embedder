@@ -626,3 +626,18 @@ input[type="file"]::file-selector-button:focus {
     outline: none;
     box-shadow: 0 0 0 3px rgba(106,141,255,0.12);
 }
+
+/* Validation invalid state: highlights inputs/files when client-side validation fails */
+.invalid-field {
+    border-color: #e53a3a !important; /* red */
+    box-shadow: 0 0 0 3px rgba(229,58,58,0.12) !important;
+}
+
+/* Small inline error message (optional use) */
+.inline-error {
+    color: #a61b1b;
+    font-size: 13px;
+    margin-top: -8px;
+    margin-bottom: 8px;
+    display: block;
+}
