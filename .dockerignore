@@ -19,4 +19,10 @@ pytest_cache/
 *.pot
 *.mo
 node_modules/
+
+# Custom files and directories to ignore
+README.md
+LICENSE
 env.ini
+env.ini.example
+Dockerfile
