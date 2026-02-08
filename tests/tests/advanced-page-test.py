@@ -46,17 +46,17 @@ def run(playwright: Playwright) -> None:
     with page.expect_download() as download1_info:
         page.get_by_role("button", name="Create").click()
     download1 = download1_info.value
-    download1.save_as("./test-results/" + download.suggested_filename)
+    download1.save_as("./test-results/" + download1.suggested_filename)
     page.locator("#advResize").select_option("480")
     with page.expect_download() as download2_info:
         page.get_by_role("button", name="Create").click()
     download2 = download2_info.value
-    download2.save_as("./test-results/" + download.suggested_filename)
+    download2.save_as("./test-results/" + download2.suggested_filename)
     page.locator("#advResize").select_option("none")
     with page.expect_download() as download3_info:
         page.get_by_role("button", name="Create").click()
     download3 = download3_info.value
-    download3.save_as("./test-results/" + download.suggested_filename)
+    download3.save_as("./test-results/" + download3.suggested_filename)
 
     # ---------------------
     context.close()
