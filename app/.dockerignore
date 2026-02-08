@@ -1,5 +1,5 @@
 .git
-.github
+../.github
 .venv
 venv
 env
@@ -23,6 +23,6 @@ node_modules/
 # Custom files and directories to ignore
 README.md
 LICENSE
-env.ini
-env.ini.example
-Dockerfile
+app/env.ini
+app/env.ini.example
+app/Dockerfile
