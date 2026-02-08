@@ -75,23 +75,7 @@
     </div>
 </div>
 
-<script>
-    const switchEl = document.getElementById("themeSwitch");
-    const body = document.body;
-
-    // Default dark mode
-    switchEl.checked = true;
-
-    switchEl.addEventListener("change", () => {
-        if (switchEl.checked) {
-            body.setAttribute("data-theme", "dark");
-            document.querySelector(".theme-label").innerText = "Dark Mode";
-        } else {
-            body.setAttribute("data-theme", "light");
-            document.querySelector(".theme-label").innerText = "Light Mode";
-        }
-    });
-</script>
+{% include "theme-selector.html" %}
 
 <!-- New JS: file input clear buttons and AJAX form submit to handle download and clearing inputs -->
 <script>

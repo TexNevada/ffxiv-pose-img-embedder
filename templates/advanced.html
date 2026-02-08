@@ -99,21 +99,7 @@
     </div>
 </div>
 
-<script>
-    // Theme toggle reuse
-    const switchEl = document.getElementById("themeSwitch");
-    const body = document.body;
-    switchEl.checked = true;
-    switchEl.addEventListener("change", () => {
-        if (switchEl.checked) {
-            body.setAttribute("data-theme", "dark");
-            document.querySelector(".theme-label").innerText = "Dark Mode";
-        } else {
-            body.setAttribute("data-theme", "light");
-            document.querySelector(".theme-label").innerText = "Light Mode";
-        }
-    });
-</script>
+{% include "theme-selector.html" %}
 
 
 </body>

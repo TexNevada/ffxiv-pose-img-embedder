@@ -21,7 +21,7 @@ else:
     port = config.getint("Boot", "PORT")
 
 # Application version (displayed in the UI)
-VERSION = "v1.6.3"
+VERSION = "v1.6.4"
 
 # Social links used in templates
 DISCORD_URL = "https://discord.gg/kWGEfw9hWU"

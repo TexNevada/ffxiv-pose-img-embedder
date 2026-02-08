@@ -1,0 +1,44 @@
+<script>
+(function(){
+    // Theme selector shared include: reads/writes a "theme" cookie and toggles data-theme
+    const switchEl = document.getElementById("themeSwitch");
+    const body = document.body;
+    const labelEl = document.querySelector('.theme-label');
+
+    function setCookie(name, value, days){
+        const d = new Date();
+        d.setTime(d.getTime() + (days*24*60*60*1000));
+        document.cookie = name + "=" + encodeURIComponent(value) + ";path=/;expires=" + d.toUTCString() + ";SameSite=Lax";
+    }
+    function getCookie(name){
+        const m = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+        return m ? decodeURIComponent(m[2]) : null;
+    }
+
+    // Initialize from cookie if present; default to dark
+    const theme = getCookie('theme');
+    if(theme === 'light'){
+        body.setAttribute('data-theme', 'light');
+        if(switchEl) switchEl.checked = false;
+        if(labelEl) labelEl.innerText = 'Light Mode';
+    } else {
+        body.setAttribute('data-theme', 'dark');
+        if(switchEl) switchEl.checked = true;
+        if(labelEl) labelEl.innerText = 'Dark Mode';
+    }
+
+    if(switchEl){
+        switchEl.addEventListener('change', ()=>{
+            if(switchEl.checked){
+                body.setAttribute('data-theme', 'dark');
+                if(labelEl) labelEl.innerText = 'Dark Mode';
+                setCookie('theme', 'dark', 365);
+            } else {
+                body.setAttribute('data-theme', 'light');
+                if(labelEl) labelEl.innerText = 'Light Mode';
+                setCookie('theme', 'light', 365);
+            }
+        });
+    }
+})();
+</script>
