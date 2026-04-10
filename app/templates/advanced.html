@@ -22,16 +22,16 @@
     {% include "container-header.html" %}
     <form id="advancedForm" action="/process_advanced" method="post" enctype="multipart/form-data" class="card">
         <h2 style="text-align:center;">Advanced Editor</h2>
-        <p class="subtitle" style="text-align:center;">Load a .pose file and edit metadata fields directly.</p>
+        <p class="subtitle" style="text-align:center;">Load a .pose or .chara file and edit metadata fields directly.</p>
         <div style="margin-bottom:12px; text-align:center;">
             <a class="green-btn" href="/">Simple Editor</a>
         </div>
-        <label>Upload .pose file (required)</label>
+        <label>Upload .pose or .chara file (required)</label>
         <div class="file-row">
-            <input id="advPoseFile" type="file" name="pose_file" accept=".pose,application/json" required>
+            <input id="advPoseFile" type="file" name="pose_file" accept=".pose,.chara,application/json" required>
             <button type="button" id="clearAdvPose" class="clear-btn">Clear</button>
         </div>
-        <p class="note">Max pose file size: 10 MB</p>
+        <p class="note">Max file size: 10 MB</p>
 
         <!-- Resize row hidden until a JSON .pose is loaded (moved below the image preview) -->
         <div id="advancedControls" style="display:none">
@@ -80,7 +80,7 @@
             </div>
 
             <div style="display:flex; gap:12px; margin-top:18px;">
-                <button id="createBtn" type="button">Create</button>
+                <button id="createBtn" type="button">Save & Download</button>
                 <button id="startOverBtn" type="button" class="danger">Start over</button>
             </div>
 
