@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>FFXIV - Pose Image Embedder for Brio</title>
+    <title>FFXIV - Image Embedder for Brio</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="{{ url_for('static', filename='advanced.js') }}"></script>
@@ -49,17 +49,17 @@
 
         {% include "form-image-resizer.html" %}
 
-        <h2>Pose File</h2>
+        <h2>Pose or chara File</h2>
 
-        <label>Pose File URL</label>
+        <label>.pose or .chara File URL</label>
         <div class="input-row">
-            <input id="poseUrlInput" type="text" name="pose_url" placeholder="https://example.com/file.pose">
-            <button type="button" id="clearPoseUrlBtn" class="clear-btn" aria-label="Clear pose URL">Clear</button>
+            <input id="poseUrlInput" type="text" name="pose_url" placeholder="https://example.com/funny.pose or https://example.com/actor.chara">
+            <button type="button" id="clearPoseUrlBtn" class="clear-btn" aria-label="Clear pose/chara URL">Clear</button>
         </div>
 
-        <label>Or upload .pose file</label>
+        <label>Or upload .pose/.chara file</label>
         <div class="file-row">
-            <input id="poseFileInput" type="file" name="pose_file" accept=".pose,application/json">
+            <input id="poseFileInput" type="file" name="pose_file" accept=".pose,.chara,application/json">
             <button type="button" id="clearPoseBtn" class="clear-btn" aria-label="Clear pose file">Clear</button>
         </div>
 

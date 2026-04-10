@@ -21,7 +21,7 @@ else:
     port = config.getint("Boot", "PORT")
 
 # Application version (displayed in the UI)
-VERSION = "v1.6.5"
+VERSION = "v1.7.0"
 
 # Social links used in templates
 DISCORD_URL = "https://discord.gg/kWGEfw9hWU"
@@ -77,8 +77,8 @@ def well_known(filename):
 @app.route("/", methods=["GET"])
 def index():
     meta_tags = {
-        "title": "FFXIV Pose Image Embedder for Brio",
-        "description": "A tool to embed images, tags & other meta_data into FFXIV .pose files for use with the Brio",
+        "title": "FFXIV Pose/Chara Image Embedder for Brio",
+        "description": "A tool to embed images, tags & other meta_data into FFXIV .pose & .chara files for use with the Brio",
         "image": url_for("static", filename="og-preview.png", _external=True),
         "url": url_for("index", _external=True)
     }
@@ -163,27 +163,22 @@ def process():
     elif pose_url:
         pose_bytes, pose_filename = fetch_file_from_url(pose_url)
     else:
-        return "Error: No pose file provided (URL or file)", 400
+        return "No pose/chara/json file provided (URL or file)", 400
 
     if not pose_filename:
         pose_filename = "../updated.pose"
 
+    validate_json_like_extension(pose_filename)
     # Require .pose extension
-    if not pose_filename.lower().endswith(".pose"):
-        return "Error: Pose file must have .pose extension", 400
-
-    # Ensure pose file is not an image
-    try:
-        with Image.open(io.BytesIO(pose_bytes)):
-            return "Error: Pose file appears to be an image; expected JSON .pose", 400
-    except UnidentifiedImageError:
-        pass
+    #json_like_format = (".pose", ".json", ".chara")
+    #if not pose_filename.lower().endswith(json_like_format):
+    #    return "Error: Pose file must have .pose extension", 400
 
     # Ensure pose file is valid JSON
     try:
         pose_json = json.loads(pose_bytes.decode("utf-8"))
     except Exception:
-        return "Error: Pose file is not valid JSON", 400
+        return "Pose/Chara/Json file is not valid JSON format", 400
 
     # If an image was uploaded, convert to base64 server-side and insert/update Base64Image
     if img_file and img_file.filename:
@@ -210,8 +205,8 @@ def process():
 def advanced():
     """Render the advanced editor page."""
     meta_tags = {
-        "title": "FFXIV Pose Image Embedder for Brio - Advanced Editor",
-        "description": "A tool to embed images & other metadata into FFXIV .pose files",
+        "title": "FFXIV Pose/Chara Image Embedder for Brio - Advanced Editor",
+        "description": "A tool to embed images & other metadata into FFXIV .pose & .chara files",
         "image": url_for("static", filename="og-preview.png", _external=True),
         "url": url_for("index", _external=True)
     }
@@ -232,7 +227,7 @@ def process_advanced():
     # Enforce pose upload only
     pose_file = request.files.get('pose_file')
     if not pose_file or not pose_file.filename:
-        return "Error: No pose file provided (upload required)", 400
+        return "Error: No .pose, .chara or .json file provided (upload required)", 400
 
     pose_bytes = pose_file.read()
     pose_filename = pose_file.filename or 'updated.pose'
@@ -240,16 +235,14 @@ def process_advanced():
     # Enforce 10 MB pose limit
     max_pose_bytes = 10 * 1024 * 1024
     if len(pose_bytes) > max_pose_bytes:
-        return f"Error: Pose file exceeds {max_pose_bytes} bytes (10 MB)", 400
+        return f"Error: The .pose/.chara./json File exceeds {max_pose_bytes} bytes (10 MB)", 400
 
-    # Validate .pose extension
-    if not pose_filename.lower().endswith('.pose'):
-        return "Error: Pose file must have .pose extension", 400
+    validate_json_like_extension(pose_filename)
 
     # Ensure pose file is not an image
     try:
         with Image.open(io.BytesIO(pose_bytes)):
-            return "Error: Pose file appears to be an image; expected JSON .pose", 400
+            return "Error: The File appears to be an image; expected JSON object file like .pose, .chara or .json", 400
     except UnidentifiedImageError:
         pass
 
@@ -257,7 +250,7 @@ def process_advanced():
     try:
         original = json.loads(pose_bytes.decode('utf-8'))
     except Exception:
-        return "Error: Pose file is not valid JSON", 400
+        return "Error: The File is not valid JSON; expected JSON object file like .pose, .chara or .json", 400
 
     # Parse changes
     changes_raw = request.form.get('changes', '').strip()
@@ -359,9 +352,13 @@ def process_advanced():
     for k, v in sanitized.items():
         original[k] = v
 
-    # If client didn't provide Base64Image but sent an image_file earlier via server-side processing, sanitized will already have it.
-
-    temp = tempfile.NamedTemporaryFile(delete=False, suffix='.pose')
+    if pose_file.filename.lower().endswith(".pose"):
+        suffix = ".pose"
+    elif pose_file.filename.lower().endswith(".chara"):
+        suffix = ".chara"
+    else:
+        suffix = ".json"
+    temp = tempfile.NamedTemporaryFile(delete=False, suffix=suffix)
     temp.write(json.dumps(original, indent=2).encode('utf-8'))
     temp.close()
 
@@ -372,7 +369,19 @@ def process_advanced():
         mimetype='application/json'
     )
 
+def validate_json_like_extension(filename: str):
+    json_like_format = (".pose", ".json", ".chara")
+    if not filename.lower().endswith(json_like_format):
+        return "The File extension must either end with .json, .pose or .chara", 400
+    return None
 
+@app.route("/brew_coffee_with_teapot", methods=['GET'])
+def brew_coffee_with_teapot():
+    return "Error: The server refuses the attempt to brew coffee with a teapot", 418
+
+@app.route("/teapot", methods=['GET'])
+def teapot():
+    return "Error: The server refuses the attempt to brew coffee with a teapot", 418
 
 if __name__ == "__main__":
     app.run(debug=debug, host=host, port=port, threaded=True)
