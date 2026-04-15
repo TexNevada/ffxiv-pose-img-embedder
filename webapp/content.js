@@ -179,21 +179,88 @@
            return;
         }
 
-        let width = img.width;
-        let height = img.height;
-        const largest = Math.max(width, height);
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        ctx.drawImage(img, 0, 0);
+
+        // Detect and crop black borders (letterboxing / pillarboxing)
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+        const w = canvas.width;
+        const h = canvas.height;
+
+        // Threshold for "black" pixel (e.g. RGB < 15)
+        const threshold = 15;
+        const isBlack = (x, y) => {
+          const idx = (y * w + x) * 4;
+          return data[idx] < threshold && data[idx + 1] < threshold && data[idx + 2] < threshold;
+        };
+
+        let top = 0, bottom = h - 1, left = 0, right = w - 1;
+
+        // Find top bound
+        while (top < h) {
+          let rowIsBlack = true;
+          for (let x = 0; x < w; x++) {
+            if (!isBlack(x, top)) { rowIsBlack = false; break; }
+          }
+          if (!rowIsBlack) break;
+          top++;
+        }
+
+        // Find bottom bound
+        while (bottom > top) {
+          let rowIsBlack = true;
+          for (let x = 0; x < w; x++) {
+            if (!isBlack(x, bottom)) { rowIsBlack = false; break; }
+          }
+          if (!rowIsBlack) break;
+          bottom--;
+        }
+
+        // Find left bound
+        while (left < w) {
+          let colIsBlack = true;
+          for (let y = top; y <= bottom; y++) {
+            if (!isBlack(left, y)) { colIsBlack = false; break; }
+          }
+          if (!colIsBlack) break;
+          left++;
+        }
+
+        // Find right bound
+        while (right > left) {
+          let colIsBlack = true;
+          for (let y = top; y <= bottom; y++) {
+            if (!isBlack(right, y)) { colIsBlack = false; break; }
+          }
+          if (!colIsBlack) break;
+          right--;
+        }
+
+        const cropWidth = (right - left) + 1;
+        const cropHeight = (bottom - top) + 1;
+
+        // Final dimensions with resize logic
+        let finalWidth = cropWidth;
+        let finalHeight = cropHeight;
+        const largest = Math.max(finalWidth, finalHeight);
 
         if (largest > maxDim) {
           const scale = maxDim / largest;
-          width = Math.max(1, Math.floor(width * scale));
-          height = Math.max(1, Math.floor(height * scale));
+          finalWidth = Math.max(1, Math.floor(finalWidth * scale));
+          finalHeight = Math.max(1, Math.floor(finalHeight * scale));
         }
 
-        const canvas = document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0, width, height);
+        const finalCanvas = document.createElement("canvas");
+        finalCanvas.width = finalWidth;
+        finalCanvas.height = finalHeight;
+        const finalCtx = finalCanvas.getContext("2d");
+        
+        // drawImage(source, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+        finalCtx.drawImage(canvas, left, top, cropWidth, cropHeight, 0, 0, finalWidth, finalHeight);
         
         // Use the original format if possible, otherwise JPEG
         let mime = blob.type;
@@ -201,7 +268,7 @@
           mime = "image/jpeg";
         }
         
-        const dataUrl = canvas.toDataURL(mime, 0.95);
+        const dataUrl = finalCanvas.toDataURL(mime, 0.95);
         resolve(dataUrl.split(",")[1]);
       };
 
