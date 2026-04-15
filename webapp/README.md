@@ -13,7 +13,6 @@ This extension adds a "Download Pose w/ Image" button to xivmodarchive.com mod p
 1. Open Firefox and go to `about:addons`
 2. Click the ⚙️ icon and **Install addon from file**
 3. Select any file inside the `webapp/` folder (e.g., `manifest.json`).
-   - *Note:* Temporary add-ons are removed when Firefox restarts. To install permanently, you would need to use a signed XPI or a developer/ESR version of Firefox that allows unsigned extensions.
 
 ## 📦 Using the Pre-built ZIP Files
 The repository includes pre-built ZIP files for each browser:
