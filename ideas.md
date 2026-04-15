@@ -1,0 +1,1 @@
+- [ ] bulk pose and image embedding. Name the files the same as the files and throw them all in. Out comes a zipfile.
