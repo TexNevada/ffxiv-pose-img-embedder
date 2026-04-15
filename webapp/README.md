@@ -10,6 +10,12 @@ This extension adds a "Download Pose w/ Image" button to xivmodarchive.com mod p
    - *Note:* Alternatively, you can use `webapp_chrome.zip` if you want to keep the extension as a single archive, but you must still load it via "Load unpacked" after unzipping it or drag-and-drop.
 
 ## 🦊 Firefox
+1. Open Firefox and go to `about:debugging#/runtime/this-firefox`
+2. Click **Load Temporary Add-on...**
+3. Select any file inside the `webapp/` folder (e.g., `manifest.json`).
+   - *Note:* Temporary add-ons are removed when Firefox restarts. To install permanently, you would need to use a signed XPI or a developer/ESR version of Firefox that allows unsigned extensions.
+
+## For Floorp or maybe other Firefox alternatives ? 
 1. Open Firefox and go to `about:addons`
 2. Click the ⚙️ icon and **Install addon from file**
 3. Select `webapp_firefox.zip` file provided in this post or compile one yourself using build.py.
