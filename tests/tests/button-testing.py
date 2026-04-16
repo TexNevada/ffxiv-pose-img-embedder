@@ -18,7 +18,7 @@ def run(playwright: Playwright) -> None:
     page.locator("span").first.click()
     page.get_by_role("link", name="Simple Editor").click()
     with page.expect_popup() as page3_info:
-        page.get_by_role("link", name="Discord Discord").click()
+        page.get_by_role("link", name="Discord / Support Discord / Support").click()
     page3 = page3_info.value
     page3.close()
     with page.expect_popup() as page4_info:
@@ -27,7 +27,7 @@ def run(playwright: Playwright) -> None:
     page4.close()
     page.get_by_role("link", name="Advanced Editor").click()
     with page.expect_popup() as page5_info:
-        page.get_by_role("link", name="Discord Discord").click()
+        page.get_by_role("link", name="Discord / Support Discord / Support").click()
     page5 = page5_info.value
     page5.close()
     with page.expect_popup() as page6_info:

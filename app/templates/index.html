@@ -1,26 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>FFXIV - Image Embedder for Brio</title>
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+{% extends "base.html" %}
+
+{% block head %}
     <script src="{{ url_for('static', filename='advanced.js') }}"></script>
-    {% include "open-graph-meta-tags.html" %}
-</head>
-<body data-theme="dark">  <!-- Dark mode default -->
+{% endblock %}
 
-<div class="theme-toggle">
-    <label class="switch">
-        <input type="checkbox" id="themeSwitch">
-        <span class="slider"></span>
-    </label>
-    <span class="theme-label">Dark Mode</span>
-</div>
-
-<div class="container">
-    {% include "container-header.html" %}
-
+{% block content %}
     <form id="mainForm" action="/process" method="post" enctype="multipart/form-data" class="card">
 
         <!-- Insert example image preview (centered, responsive) -->
@@ -70,13 +54,9 @@
         {% include "container-footer.html" %}
 
     </form>
-    <div class="center">
-        <p class="subtitle">Made by Tex Nevada - {{ version }}</p>
-    </div>
-</div>
+{% endblock %}
 
-{% include "theme-selector.html" %}
-
+{% block scripts %}
 <!-- New JS: file input clear buttons and AJAX form submit to handle download and clearing inputs -->
 <script>
     (function(){
@@ -235,5 +215,4 @@
          });
     })();
 </script>
-</body>
-</html>
+{% endblock %}

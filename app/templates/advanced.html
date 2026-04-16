@@ -1,25 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Advanced - Pose Editor</title>
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+{% extends "base.html" %}
+
+{% block title %}Advanced - Pose Editor{% endblock %}
+
+{% block head %}
     <script src="{{ url_for('static', filename='advanced.js') }}" defer></script>
-    {% include "open-graph-meta-tags.html" %}
-</head>
-<body data-theme="dark">
+{% endblock %}
 
-<div class="theme-toggle">
-    <label class="switch">
-        <input type="checkbox" id="themeSwitch">
-        <span class="slider"></span>
-    </label>
-    <span class="theme-label">Dark Mode</span>
-</div>
-
-<div class="container">
-    {% include "container-header.html" %}
+{% block content %}
     <form id="advancedForm" action="/process_advanced" method="post" enctype="multipart/form-data" class="card">
         <h2 style="text-align:center;">Advanced Editor</h2>
         <p class="subtitle" style="text-align:center;">Load a .pose or .chara file and edit metadata fields directly.</p>
@@ -93,14 +80,4 @@
         {% include "container-footer.html" %}
 
     </form>
-
-    <div class="center">
-        <p class="subtitle">Made by Tex Nevada - {{ version }}</p>
-    </div>
-</div>
-
-{% include "theme-selector.html" %}
-
-
-</body>
-</html>
+{% endblock %}
