@@ -21,7 +21,7 @@ else:
     port = config.getint("Boot", "PORT")
 
 # Application version (displayed in the UI)
-VERSION = "v1.7.0"
+VERSION = "v1.7.1"
 
 # Social links used in templates
 DISCORD_URL = "https://discord.gg/kWGEfw9hWU"
@@ -211,6 +211,17 @@ def advanced():
         "url": url_for("index", _external=True)
     }
     return render_template("advanced.html", meta_tags=meta_tags, version=VERSION, discord_url=DISCORD_URL, github_url=GITHUB_URL, shoutout=SHOUTOUT)
+    
+@app.route("/browser-ext", methods=["GET"])
+def browser_ext():
+    """Render the browser extension info page."""
+    meta_tags = {
+        "title": "FFXIV Pose/Chara Image Embedder - Browser Extension",
+        "description": "Information about the experimental FFXIV pose image embedder browser extension.",
+        "image": url_for("static", filename="og-preview.png", _external=True),
+        "url": url_for("browser_ext", _external=True)
+    }
+    return render_template("browser-ext.html", meta_tags=meta_tags, version=VERSION, discord_url=DISCORD_URL, github_url=GITHUB_URL, shoutout=SHOUTOUT)
 
 
 @app.route("/process_advanced", methods=["POST"])

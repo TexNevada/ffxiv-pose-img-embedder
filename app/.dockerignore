@@ -26,3 +26,4 @@ LICENSE
 app/env.ini
 app/env.ini.example
 app/Dockerfile
+webapp/

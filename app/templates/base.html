@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}FFXIV - Image Embedder for Brio{% endblock %}</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% block head %}{% endblock %}
+    {% include "open-graph-meta-tags.html" %}
+</head>
+<body data-theme="dark">
+    {% include "theme-toggle.html" %}
+
+    <div class="container">
+        {% include "container-header.html" %}
+        
+        {% block content %}{% endblock %}
+
+        <div class="center">
+            {% include "signature.html" %}
+        </div>
+    </div>
+
+    {% include "theme-selector.html" %}
+    {% block scripts %}{% endblock %}
+</body>
+</html>

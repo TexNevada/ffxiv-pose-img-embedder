@@ -3,6 +3,8 @@ name: Docker Image CI to GHCR
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'app/**'
 
 jobs:
 
