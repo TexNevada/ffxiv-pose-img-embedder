@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Browser Extension (WIP) - FFXIV Pose/Chara Image Embedder{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="padding: 20px; border: 2px solid #FF4500; border-radius: 8px; margin-bottom: 20px; background-color: rgba(255, 69, 0, 0.1);">
+        <h2 style="color: #FF4500; margin-top: 0;">⚠️ Experimental / Work In Progress</h2>
+        <p>Look, this thing is experimental. It's not perfect but it works darn well if you want to skip the manual upload and merge on this page. This is to make the process easier for people looking for poses. While this page still helps posers add images to their poses before uploading them.</p>
+        <p>I am trying to gauge people's interest on this. So please join the discord and voice your opinion on this and give feedback!</p>
+        <a class="social-btn" id="discordBtn" href="{{ discord_url }}" target="_blank" rel="noopener noreferrer">
+            <img src="{{ url_for('static', filename='discord.webp') }}" alt="Discord / Support">
+            <span>Discord</span>
+        </a>
+    </div>
+
+    <h2>What is this extension?</h2>
+    <p>Basically, this browser extension lets you download .pose with the preview image, author, and tags off xivarchive without needing to merge them manually to this site. It's designed to save you a few clicks!</p>
+    <p>If you're on <b>xivmodarchive.com</b> and go to a pose page, it adds a button to mod page. </p>
+    <img src="../static/browser-ext-button.png" width="329"/>
+
+    <p>Pose pages without a .pose file will say "Pose file not detected"</p>
+    <img src="../static/browser-ext-invalid-button.png" width="329"/>
+    <p>This also makes it easier to search for saved poses using tags in posing tools that support it!</p>
+    <h2>How it works (The technical-ish bit)</h2>
+    <p>The extension uses a script (content.js) that hangs out on xivmodarchive.com. When you're looking at a mod page, it sticks a "Download Pose w/ Image" button right there in the download section. </p>
+    
+    <p>Here's what it's doing behind the scenes:</p>
+    <ul>
+        <li>It finds the download link and checks if it's actually a .pose file.</li>
+        <li>It grabs the preview image, tags and the author's name from the mod page.</li>
+        <li>It resizes the image down to 720p (and even tries to crop out those annoying black bars) and stuffs it all into the .pose.</li>
+        <li>Finally, it hands you the updated file directly. No need to visit this site at all if you're just grabbing stuff from the xivarchive.</li>
+    </ul>
+
+    <p>It's basically a "one-click" version of what this site does for those who are downloading poses, specifically tailored for xivmodarchive (For now). It's still might need some work, but it saves a lot of time.</p>
+
+    <h3>That's cool! Is the extension in chrome/firefox extension stores?</h3>
+    <p>No... I will get around to doing that if interest grows. Google wants payment for the extension upload while Firefox is free (Luckily!)</p>
+    <p>If you want to use this extension then you need to manually install it yourself for now.</p>
+    <P>The extension is free and open source! Feel free to have a look at the code on github!</P>
+
+    <div style="margin-top: 30px; text-align: center;">
+        <a href="https://github.com/TexNevada/ffxiv-pose-img-embedder/releases" class="green-btn orange-red-btn" target="_blank" rel="noopener noreferrer" style="padding: 15px 30px; font-size: 1.2em; text-decoration: none; border-radius: 8px; display: inline-block;">
+            Get the Extension here
+        </a>
+    </div>
+
+    <div style="margin-top: 40px; text-align: center;">
+        <a href="/" class="green-btn" style="display: inline-block; padding: 10px 20px;">Back to Home</a>
+    </div>
+
+    {% include "container-footer.html" %}
+</div>
+{% endblock %}
