@@ -1,5 +1,7 @@
-* text eol=crlf
+# Handle text files automatically (normalized to LF in repo)
+* text=auto
 
+# Keep binary files safe
 *.png binary
 *.jpg binary
 *.jpeg binary
