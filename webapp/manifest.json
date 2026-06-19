@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "FFXIV - Pose Image Embedder",
-  "description": "Provided by: https://ffxiv.edb.tools / Tex Nevada \nAdds a Download button on xivarchive.com that embeds the mod preview image, author, and tags into .pose files before downloading.",
+  "description": "Provided by: https://ffxiv.edb.tools / Tex Nevada \nAdds a Download button on xivarchive.com that embeds the mod preview image, author, and tags into .pose files (or .pose files inside ZIP archives) before downloading.",
   "version": "1.0.0",
   "permissions": [
     "contextMenus"
@@ -21,13 +21,13 @@
         "https://www.xivmodarchive.com/*",
         "https://xivmodarchive.com/*"
       ],
-      "js": ["content.js"],
+      "js": ["jszip.js", "content.js"],
       "run_at": "document_idle"
     }
   ],
   "icons": {
-    "48": "icon48.png",
-    "128": "icon128.png"
+    "48": "static/icon48.png",
+    "128": "static/icon128.png"
   },
   "browser_specific_settings": {
     "gecko": {

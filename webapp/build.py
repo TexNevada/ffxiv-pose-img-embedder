@@ -3,8 +3,17 @@ import zipfile
 import os
 
 def build_extension():
-    # File list (excluding zips and manifest itself)
-    files = ["background.js", "content.js", "icon48.png", "icon128.png"]
+    # File list (excluding zips and manifest itself).
+    # Paths are repo-relative; they are written into the archive at the
+    # same relative path so manifest references like "static/icon48.png"
+    # resolve correctly when the extension is loaded.
+    files = [
+        "background.js",
+        "content.js",
+        "jszip.js",
+        "static/icon48.png",
+        "static/icon128.png",
+    ]
     
     # Read base manifest (Chrome-compatible)
     with open("manifest.json", "r", encoding="utf-8") as f:
