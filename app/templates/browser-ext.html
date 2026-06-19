@@ -6,7 +6,7 @@
 <div class="card">
     <div style="padding: 20px; border: 2px solid #FF4500; border-radius: 8px; margin-bottom: 20px; background-color: rgba(255, 69, 0, 0.1);">
         <h2 style="color: #FF4500; margin-top: 0;">⚠️ Experimental / Work In Progress</h2>
-        <p>Look, this thing is experimental. It's not perfect but it works darn well if you want to skip the manual upload and merge on this page. This is to make the process easier for people looking for poses. While this page still helps posers add images to their poses before uploading them.</p>
+        <p>Look, this thing is experimental. It's not perfect but it works darn well if you want to skip the manual upload and merge on this page. This is to make the process easier for people looking for poses. While this page still helps pose creators, the extension exist to help general gposer.</p>
         <p>I am trying to gauge people's interest on this. So please join the discord and voice your opinion on this and give feedback!</p>
         <a class="social-btn" id="discordBtn" href="{{ discord_url }}" target="_blank" rel="noopener noreferrer">
             <img src="{{ url_for('static', filename='discord.webp') }}" alt="Discord / Support">
@@ -15,25 +15,54 @@
     </div>
 
     <h2>What is this extension?</h2>
-    <p>This browser extension lets you download a .pose file with the preview image, author, and tags off XIV Mod Archive without needing to merge them manually to this site. It's designed to save you a few clicks!</p>
-    <p>If you're on <b>xivmodarchive.com</b> and go to a pose page, it adds a button to the mod page. </p>
-    <img src="../static/browser-ext-button.png" width="329"/>
+    <p>This browser extension lets you download <b>.pose</b> files straight off XIV Mod Archive with the preview image, author, tags, description, and last update date already embedded — no need to manually upload and merge them on this site. It's designed to save you a few clicks!</p>
+    <p>When you're on <b>xivmodarchive.com</b> and go to a pose page, it adds a blue button right above the site's normal "Download Mod" link. The original download still works exactly as before — this just adds a richer version above it. The label adapts to what the page offers:</p>
+    <p></p>
+    <p>Examples of the download buttons:</p>
+    <table>
+        <tbody>
+            <tr><td><img src="../static/DownloadPoseFile.png" alt="Download Pose w/ Image button"/></td></tr>
+            <tr><td><img src="../static/DownloadPosesZip.png" alt="Download Poses / ZIP w/ Image button"/></td></tr>
+            <tr><td><img src="../static/browser-ext-button.png" alt="Download Pose w/ Image button on the mod page"/></td></tr>
+            <tr><td><img src="../static/browser-ext-invalid-button.png" alt="Pose file not detected button"/></td></tr>
+        </tbody>
+    </table>
 
-    <p>Pose pages without a .pose file will say "Pose file not detected"</p>
-    <img src="../static/browser-ext-invalid-button.png" width="329"/>
-    <p>This also makes it easier to search for saved poses using tags in posing tools that support it!</p>
-    <h2>How it works (The technical-ish bit)</h2>
-    <p>The extension uses a script (content.js) that hangs out on xivmodarchive.com. When you're looking at a mod page, it sticks a "Download Pose w/ Image" button right there in the download section. </p>
-    
-    <p>Here's what it's doing behind the scenes:</p>
+    <h2>What does the extension do?</h2>
+
+    <h3>Warns you about old "Dawntrail-compatible" poses</h3>
+    <p>Plenty of older poses are still tagged as Dawntrail-compatible on the site but were never updated after the patch broke facial expressions. On any pose page whose <b>Last Version Update</b> is before Dawntrail's release date (2024-07-02), the extension swaps the green "✅ compatible" badge for a yellow "⚠️" warning, so you know to expect issues before you download.</p>
+
+    <h4>Before &amp; after</h4>
+    <img src="../static/DTCompat_example.png" alt="Default Dawntrail compatibility badge" style="max-width: 100%; height: auto;"/>
+
     <ul>
-        <li>It finds the download link and checks if it's actually a .pose file.</li>
-        <li>It grabs the preview image, tags, and the author's name from the mod page.</li>
-        <li>It resizes the image down to 720p (and even tries to crop out those annoying black bars) and stuffs it all into the .pose.</li>
+        <li><b>Tags are easier to search for in posing tools!</b></li>
+        <li><b>Your poses remember where they came from.</b> Every pose you download is automatically stamped with the preview image, the author's name, the tags, the page description (with a link back to the mod page), and the pose's last update date. Months later you'll still know which mod page each pose came from and what it's supposed to look like.</li>
+        <li><b>Handles ZIP archives in one click.</b> Many pose mods ship as a ZIP containing several poses. The extension opens the ZIP, updates every <code>.pose</code> inside, and re-packages it under the original filename. Everything else in the archive — textures, READMEs, screenshots — is left completely untouched.</li>
+        <li><b>Finds the real archive when the main download is an external link.</b> Some authors point "Download Mod" at Twitter/X, Patreon, etc. and put the actual <code>.zip</code> in the "Other Files and Links" section. The extension scans that list and uses the first usable archive it finds.</li>
+        <li><b>Fixes pose files with a missing <code>.pose</code> extension.</b> Some authors package a pose without the <code>.pose</code> ending. The extension recognizes pose files by their contents, adds the extension, and updates them so your posing tool (Anamnesis, Ktisis, etc.) sees them correctly.</li>
+        <li><b>Never overwrites info the author already filled in.</b> If a pose already has an author, description, tags, version, or preview image set by hand, those are left exactly as written. It only fills in what's empty or missing.</li>
+        <li><b>Cleans up preview images automatically.</b> Black bars are cropped off and images are scaled to 720p so the resulting pose file doesn't balloon in size. GIFs pass through unchanged.</li>
+        <li><b>Everything happens on your machine.</b> Every step runs locally inside your browser tab. No files are uploaded anywhere, no telemetry, no third-party servers.</li>
+        <li><b>Safety checks against malicious archives.</b> Untrusted ZIPs are checked against size, structure, and path-traversal limits (including ZIP-bomb protection) before anything is touched. If something looks wrong it stops and shows an error.</li>
+        <li><b>Works on Chromium &amp; Firefox based browsers.</b> (More testing is still needed on Firefox.)</li>
+    </ul>
+
+
+
+    <h2>How it works (The technical-ish bit)</h2>
+    <p>The extension uses a script (content.js) that lives in your browser and checks on xivmodarchive.com. When you're looking at a mod page, it sticks the download button right there in the download section and changes the Dawntrail message section if it detects a pre-dawntrail pose.</p>
+
+    <p>Here's what it's doing when you click download:</p>
+    <ul>
+        <li>It finds the download link and checks whether it's a <code>.pose</code> file or a <code>.zip</code> archive.</li>
+        <li>It grabs the preview image, tags, author, description, and last update date from the mod page.</li>
+        <li>It resizes the image down to 720p (and tries to crop out those annoying black bars) and stuffs it all into the <code>.pose</code> — or into every <code>.pose</code> inside the ZIP.</li>
         <li>Finally, it hands you the updated file directly. No need to visit this site at all if you're just grabbing stuff from the XIV Mod Archive.</li>
     </ul>
 
-    <p>It's basically a "one-click" version of what this site does for those who are downloading poses, specifically tailored for xivmodarchive (For now). It's still might need some work, but it saves a lot of time.</p>
+    <p>It's basically a "one-click" version of what this site does for those who are downloading poses, specifically tailored for xivmodarchive (For now). It might still need some work, but it saves a lot of time.</p>
 
     <h3>That's cool! Is the extension in chrome/firefox extension stores?</h3>
     <p>No... I will get around to doing that if interest grows. Google wants payment for the extension upload while Firefox is free (Luckily!)</p>

@@ -12,7 +12,7 @@ import io
 if not Path("env.ini").exists():
     debug = False
     host = "0.0.0.0"
-    port = 80
+    port = 80 # Borked it in dev. Fixing port number
 else:
     config = configparser.ConfigParser()
     config.read("env.ini")
