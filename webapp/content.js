@@ -1084,12 +1084,16 @@
       return;
     }
 
+    // Only ever act on Pose pages. A gear/other mod page can also serve a
+    // .zip (or .rar/.7z) download, which would otherwise look "supported"
+    // and trip the injection below — but this extension must never touch
+    // anything that isn't a pose. Bail out before doing anything else.
+    const isPoseCat = isPoseCategory();
+    if (!isPoseCat) return;
+
     const downloadUrl = getEffectiveDownloadUrl();
     const supported = isSupportedDownload(downloadUrl);
     const unsupportedLabel = getUnsupportedArchiveLabel(downloadUrl);
-    const isPoseCat = isPoseCategory();
-
-    if (!supported && !unsupportedLabel && !isPoseCat) return; // Nothing actionable on this page
 
     // Find the container that holds the "Download Mod" button
     const downloadContainer = document.querySelector("#mod-download-link")?.closest(
